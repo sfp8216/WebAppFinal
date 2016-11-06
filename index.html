@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <style>
+    .userListItem{
+        font-weight:bold;
+    }
+    .userListItem:hover{
+        cursor:pointer;
+    }
+
+    </style>
+  <title>test</title>
+  <script src="http://code.jquery.com/jquery-latest.js">
+</script>
+<script type="text/javascript" src="js/Whiteboard.js"></script>
+<script type="text/javascript" src="js/SvgElement.js"></script>
+<script>
+
+var checkChat;
+var checkBoard;
+
+  $(document).ready(function(){
+        //go getChat...
+        //TEMPORARLILY LOAD BOARD       name,owner,status,size, title, borderColor
+
+
+        getTurnGame();
+        checkLogin();
+        $( "#submitBtn" ).on('click',function( event ) {
+                checkLogin();
+        });
+        $("#newUserBtn").on('click',function(event){
+         createLogin();
+        });
+
+        $("#submitChat").on('click',function(event){
+         sendChat();
+        });
+        $("#logoutBtn").on('click',function(event){
+         logout();
+        });
+    });
+
+/*****************************
+*
+*
+*------- LOGIN ---------------
+*
+*
+*****************************/
+    function checkLogin(){
+        var info = $("#username").val() +"|"+$("#password").val();
+         myXhr('get',{method:'checkLoginSvs',a:'login',data:info}).done(function(json){
+            $('#logged').html('Logged in: '+json[0].Logged);
+            $("#logoutBtn").show();
+            if(json[0].Logged){
+                getChatLobbies();
+                getUserList();
+                checkInvites();
+                getBoards();
+
+            }
+            //TODO make sessions and stuff
+        });
+    }
+
+    function createLogin(){
+        var info = $("#newUser").val() + "|" + $("#newPass").val();
+        myXhr('get',{method:'createLoginSvs',a:'login',data:info}).done(function(json){
+            alert("DONE");
+        });
+    }
+
+    function getUserList(lobbyId){
+        if(!lobbyId){
+            lobbyId = "0";
+        }
+        myXhr('get',{method:'getUserListSvs',a:'login',data:lobbyId}).done(function(json){
+    for(i=0;i<json.length;i++){
+        console.log(json.length);
+        $("#userList").append("<br><span class='userListItem'>"+json[i].username+"</span>" );
+    }
+        });
+    }
+
+    function logout(){
+        myXhr('get',{method:'logoutSvs',a:'login',data:"null"}).done(function(json){
+            console.log(json);
+            if(json[0].Logout=="Success"){
+              $("#logoutBtn").hide("");
+            }
+        });
+    }
+/*****************************
+*
+*
+*------- CHAT ---------------
+*
+*
+*****************************/
+    function canJoinLobby(lobbyId){
+        if(checkChat){
+            $("#inputChat").hide();
+            $("#submitChat").removeAttr("name");
+            clearTimeout(checkChat);
+        }
+        getChat(lobbyId);
+    }
+     function getChat(lobbyId){
+        myXhr('get',{method:'getChatSvs',a:'chat',data:lobbyId}).done(
+            function(json){
+                //I'm back with good data...  Do something on the page!
+                var h='';
+                console.log(json);
+                for(i=0;i<json.length;i++){
+                    h+=json[i].username+' says: '+json[i].message+' <span style="font-size:2pt;">'+json[i].time+'</span><br/>';
+                }
+                $('h5').html(h);
+
+                if($('#inputChat').css('display') == 'none'){
+                    $("#inputChat").show();
+                    $("#submitChat").attr("name",lobbyId);
+                }
+                 checkChat = setTimeout(function(){
+                  getChat(lobbyId);
+                },2000);
+            }
+        );
+     }
+
+     function getChatLobbies(){
+         myXhr('get',{method:'getChatLobbiesSvs',a:'chat',data:"null"}).done(
+         function(json){
+             var a="";
+             for(i=0;i<json.length;i++){
+                    a+="<button type='button' onclick='canJoinLobby("+json[i].lobbyId+");'>"+json[i].name+' ID: '+json[i].lobbyId;
+                    if(json[i].permission == ("0")){
+                        a+=" [  ]</button> <br/>";
+                    }else if(json[i].permission == ("1")){
+                        a+=" [X] </button><br/>";
+                    }
+                }
+                $('#lobbies').append(a);
+
+         })
+     }
+
+     function sendChat(){
+         var lobbyId = $("#submitChat").attr("name");
+         var chatMessage = $("#chatMessage").val();
+         myXhr('get',{method:'sendChatSvs',a:'chat',data:lobbyId+"|"+chatMessage}).done(
+         function(json){
+             getChat(1);
+             $("#chatMessage").val("");
+         });
+     }
+
+    function checkInvites(){
+        //Data USerId
+        //TODO HARDCODED USERID, BAD
+        //Getting it from session ID
+            myXhr('get',{method:'checkChatInviteSvs',a:'chat',data:"null"}).done(function(json){
+                for(i=0; i<json.length;i++){
+                    var q = "You've been invited to join " +json[i].name + " by " + json[i].username +"<br>";
+                    $("#InviteStatus").append(q);
+                }
+
+         });
+    }
+
+         function inviteToBoard(){
+         //Data is
+         // boardid|Inviter|Invited
+         myXhr('get',{method:'inviteToBoardSvs',a:'chat',data:"1|1|2"}).done(function(json){
+             alert("INVITED GUY");
+
+         });
+     }
+
+/*****************************
+*
+*
+*------- BOARD ---------------
+*
+*
+*****************************/
+
+    function getBoards(){
+        myXhr('get',{method:'getBoardsSvs',a:'board',data:"null"}).done(function(json){
+            var list = $("#listOfBoards");
+            var whiteboard;
+            var ul = document.createElement("ul");
+            for(i=0;i<json.length;i++){
+               var li = document.createElement("li");
+               li.setAttribute("data-id",json[i].boardId);
+               li.setAttribute("data-name",json[i].name);
+               li.append(document.createTextNode(json[i].name + ((json[i].public == 1) ? " PUBLIC" : " PRIVATE")));
+               whiteboard = new Whiteboard("whiteboard", json[i].ownerId,json[i].public,400,json[i].name,"red","boardSpace");
+               li.addEventListener('click',function(){
+                var svgcanvas = document.getElementById("boardSpace")
+                    while (svgcanvas.hasChildNodes()) {
+                      svgcanvas.removeChild(svgcanvas.lastChild);
+                    }
+                   whiteboard.create(this.getAttribute("data-id"), this.getAttribute("data-name"));
+                   loadBoard(this.getAttribute("data-id"));
+               });
+               ul.append(li);
+            }
+            list.append(ul);
+        });
+    }
+
+
+     //data: gameId|userId
+     function getTurnGame(){
+        myXhr('get',{method:'getTurnSvs',a:'board',data:"55|32"}).done(function(json){
+            $('#turn').html('Your turn: '+json[0].turn);
+            if(!json[0].turn) setTimeout(getTurnGame,2500);
+        });
+     }
+     //Type: Path, Square, Etc
+     //Points: Points for the type
+     //id: identifier board|timestamp    saveBoardStroke("path",pathData,boardId,strokeId
+     function saveBoardStroke(type,points,boardId, strokeId){
+        myXhr('get',{method:"saveStrokeSvs",a:'board',data:"path"+"|"+points+"|"+boardId+"|"+strokeId}).done(function(json){
+           console.log("SAVED");
+        });
+     }
+     function loadBoard(boardId){
+         if(checkBoard){
+                 clearTimeout(checkBoard);
+         }
+             myXhr('get',{method:"loadBoardSvs",a:'board',data:boardId}).done(function(json){
+             for(i=0;i<json.length;i++){
+                 //Check if element already exists
+                 var checkExist = document.getElementById(json[i].userid+"|"+json[i].boardId+"|"+json[i].strokeId);
+                 if(!checkExist){
+                 var board = new SvgElement(json[i].userid+"|"+json[i].boardId+"|"+json[i].strokeId,"path",json[i].points,"purple");
+                 board.create();
+                 }
+             }
+       checkBoard =  setTimeout(function(){
+                  loadBoard(boardId);
+                },2000);
+        });
+     }
+
+
+
+    /*****************************
+    *
+    *
+    *------- XHR SHORTCUT ---------------
+    *
+    *
+    *****************************/
+     //////////////////////////////////
+     //XHR shortcut
+     //GetOrPost - which is it?
+     //d - data looks like: {name:val,name2:val2...}
+     //id - id of the holder if I want to put a spinner in it...
+     function myXhr(GetOrPost,d,id){
+        return $.ajax({
+            type:GetOrPost,
+            async:true,
+            cache:false,
+            url:'mid.php',
+            dataType:'json',
+            data:d,
+            beforeSend:function(){
+                //turn on spinner if id sent in
+                if(id){
+                    $(id).append('<img src="someSpinner.gif" class="spin"/>');
+                }
+            }
+        }).always(function(){
+            //kill spinner
+            if(id){
+                $(id).find('img.spin').fadeOut(1500,function(){
+                    $(this).remove();
+                });
+            }
+        }).fail(function(){
+            //handle failure...
+        });
+     }
+
+  </script>
+</head>
+
+<body>
+    <header>
+        <h1>Whiteboard App</h1>
+    </header>
+    Please login to continue <br/>
+<div style="display:relative;">
+<div>
+  <form method="post" id="login" name="login">
+    <span>Username:</span><input type="text" name="username" id="username"><br>
+    <span>Password:</span><input type="password" name="password" id="password">
+    <hr>
+    <button type="button" name="submitBtn" id="submitBtn">Login</button><button type="reset">Reset</button>
+  </form>
+  <button type="button" name="logout" id="logoutBtn" style="display:none;">Logout</button>
+  <div id="logged">
+      ?
+  </div>
+  <div id="turn">
+    Your turn:
+  </div>
+<hr/>
+Create Account
+  <form method="post" id="createLogin" name="createLogin">
+    <span>Username:</span><input type="text" name="newUser" id="newUser"><br>
+    <span>Password:</span><input type="password" name="newPass" id="newPass">
+    <hr>
+    <button type="button" name="submitBtn" id="newUserBtn">Login</button><button type="reset">Reset</button>
+  </form>
+</div>
+<br>
+<div id="InviteStatus">
+
+</div>
+</div>
+  <div id="listOfBoards">
+        List of boards:<br>
+    </div>
+<div style="border:2px solid purple;width:45%; float:left;" id="boardSpace">
+
+
+</div>
+<div>
+    <div style="border:2px solid black;width:45%;float:left;">
+        <div id="lobbies" style="width:20%;float:right;">
+        Chat Lobbies:
+        </div>
+        <div id="userList">
+        Logged in users:
+        </div>
+        <h5></h5>
+    <div>
+        <form method="post" name="postChat" id="inputChat" style="display:none;">
+            <input type="text" name="chat" id="chatMessage"><button type="button" name="submitChat" id="submitChat"  >Send</button>
+        </form>
+    </div>
+    </div>
+</div>
+</body>
+</html>
+
