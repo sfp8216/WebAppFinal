@@ -12,8 +12,11 @@ function getChatLobbiesSvs($d,$ip,$token){
     else{
         echo '[{"Error":"Please Login"}]';
     }
+}
 
-
+function getChatUsersSvs($data){
+    $lobbyId = $data;
+    echo(getChatUsersData($lobbyId));
 }
 
 function getChatSvs($d,$ip,$token){
@@ -40,7 +43,8 @@ function sendChatSvs($data,$ip,$token){
         $message=$h[1];
        echo(sendChatData($lobbyId,$userId,$message));
     }else{
-        //TODO
+        //TODO  FIX ERROR
+        
     echo "error";
     }
 }
@@ -56,6 +60,6 @@ function checkChatInviteSvs($data){
 
 //eventually, need setChat(), clearChat(), banFromChat()
 
-  
+
 
 ?>

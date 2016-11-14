@@ -19,9 +19,25 @@ function getChatLobbiesData() {
     }
     catch ( Exception $e ) {
         log_error($e, $sql, null);
-        echo '[{error":error"}]';
+        echo '[{error":Error with get lobbies"}]';
     }
 }
+
+function getChatUsersData($lobbyId){
+    global $pdo;
+    $sql = "SELECT users.username, users.userId FROM users INNER JOIN chatusers on chatusers.userid=users.userid Where chatusers.lobbyid = ?";
+    try{
+        if($stmt=$pdo ->prepare($sql)){
+            $stmt->bindParam(1,$lobbyId);
+            echo returnJson($stmt);
+            $stmt->close();
+            $pdo->close();
+        }
+    }catch(Exception $e){
+        echo "Error";
+    }
+}
+
 function getChatData($lobbyId) {
 //probably need 2 args, game_id and user_id?
     global $pdo; //import the var into the function...
@@ -80,7 +96,7 @@ function checkChatInviteData($data) {
         }
     }
     catch ( Exception $e ) {
-        echo "sadness";
+        echo "Error with check chat invite data";
     }
 }
 /*********************************Utilities*********************************/
@@ -100,6 +116,6 @@ function returnJson($stmt) {
 //MUST change the content-type
     header("Content-Type:text/plain");
 // This will become the response value for the XMLHttpRequest object
-    return json_encode($stmt->fetchAll());
+    return json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
 }
 ?>

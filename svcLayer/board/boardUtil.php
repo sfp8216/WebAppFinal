@@ -6,7 +6,19 @@ function getBoardsSvs(){
     //SECURITY
     echo(getBoardsData());
 }
+function lockBoardSvs($data){
+    $boardId = $data;
+    $userId = checkSession();
+    echo(lockBoardData($boardId,$userId));
+}
 
+function checkLockSvs($data){
+    $h = explode("|",$data);
+    $boardId = $h[0];
+    $overwrite = $h[1];
+    $userId = checkSession();
+    echo(checkLockData($boardId,$overwrite,$userId));
+}
 function saveStrokeSvs($data) {
 //$data: gameId|userId
 //security               dStroke("path",pathData,boardId,strokeId
@@ -50,6 +62,56 @@ function getTurnSvs($data, $ip, $token) {
 function clearBoardSvs($data){
     //SECURITYYYYYYYYYYYYY
     echo clearBoardData($data);
+}
+
+
+function createBoardSvs($data){
+    //CLEAN IT  TODO FINISH IT
+    $h = explode('|',$data);
+    //Data =
+    // BoardName|OwnerId| ChatLobbyId| Public or private
+    $boardName = $h[0];
+    $ownerId = checkSession();
+    $public = (int)$h[1];        
+    echo(createBoardData($boardName,$ownerId,$public));
+}
+function deleteBoardSvs($data){
+       //CLEAN IT  TODO FINISH IT
+        $h = explode('|',$data);
+        //Data =
+        // BoardName|OwnerId| ChatLobbyId| Public or private
+        $boardName = $h[0];
+        $ownerId = checkSession();
+        echo(deleteBoardData($name,$ownerId));
+}
+function inviteToBoardSvs($data){
+    $h = explode('|',$data);
+    //Data =
+    // BoardName|OwnerId| ChatLobbyId| Public or private
+    $boardId = $h[0];
+    $userId = $h[1];
+    $inviteer = checkSession();
+
+    echo(inviteToBoardData($boardId,$userId,$inviteer));
+}
+
+function updateInviteSvs($data){
+    $h = explode('|',$data);
+    $boardName = $h[0];
+    $inviter = $h[1];
+
+    $invitee = checkSession();
+    $acceptOrDeny = $h[2];
+    if($acceptOrDeny == 1){
+        echo(acceptBoardInviteData($boardName, $inviter, $invitee));
+    }else if($acceptOrDeny == 0){
+           echo(denyBoardInviteData($boardName, $inviter, $invitee));
+    }
+}
+
+function canJoinBoardSvs($boardId){
+    $userId = checkSession();
+    echo(canJoinBoardData($boardId,$userId));
 }
 
 //HELPER FUNCTION
