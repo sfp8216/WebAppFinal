@@ -1,6 +1,8 @@
 var checkChat;
 var checkBoard;
 var inviteTimeout;
+var timerCheck = null;
+var timerTimeout;
 $(document).ready(function() {
     //go getChat...
     //TEMPORARLILY LOAD BOARD       name,owner,status,size, title, borderColor
@@ -38,7 +40,6 @@ $(document).ready(function() {
        denyBoardInvite($(this).attr("data-id"));
     });
 
-
   	$('#inviteModal').on('show.bs.modal', function(event) {
         var button = $(event.relatedTarget);
         var recipient = button.data('username');
@@ -55,7 +56,6 @@ $(document).ready(function() {
         var recipient = button.data("id");
 
         var name = recipient.split("_")[1].split("|")[0];
-
 
         var modal = $(this);
         modal.find('.modal-title').text('Accept invitation to join  ' + name);
@@ -81,14 +81,23 @@ function checkLogin() {
         data: info
     }).done(function(json) {
         $('#logged').html('Logged in: ' + json[0].Logged);
-        $("#logoutBtn").show();
-        $("#submitBtn").hide();
-        if (json[0].Logged) {
+        var status = json[0].Logged;
+
+        //Success
+        //Fail
+        //true
+        if (status == "success" || status == "true") {
+            var location = document.location.href.split("/")[document.location.href.split("/").length-1];
+            if(location == "login.php" || location == "index.html"){
+               window.location.href = "board.php";
+            }
             //Remove chat lobbies
              // getChatLobbies();
             getUserList();
             checkInvites();
             getBoards();
+        }else{
+            alert("Failed");
         }
         //TODO make sessions and stuff
     });
@@ -114,10 +123,11 @@ function getUserList(lobbyId) {
         a: 'login',
         data: lobbyId
     }).done(function(json) {
+        console.log(json);
         for (i = 0; i < json.length; i++) {
             $("#userList").append(
                 "<br><span class='userListItem' data-toggle='modal' data-target='#inviteModal' data-username=" +
-                json[i].username + ">" + json[i].username + "</span>");
+                json[i].username + ">" + json[i].username + "</span><span class='owls'>"+json[i].status+"</span>");
         }
     });
 }
@@ -131,6 +141,8 @@ function logout() {
         if (json[0].Logout == "Success") {
             $("#logoutBtn").hide("");
             $("#submitBtn").show();
+            //Redirect to login
+            window.location.href = "login.php";
         }
     });
 }
@@ -407,7 +419,19 @@ function loadBoard(boardId) {
                 $("#locked").append(inUse);
               //  alert("NO WRITE");
             }else{
+                    if(locked == "timed"){
+                     $("#locked").text("You are drawing...");
+                     if(timerCheck == null){
+                    var fiveMinutes = 30,
+                    display = document.querySelector('#timer');
+                    timerCheck = "checkedOut";
+                  //  timerTimeout =startTimer(fiveMinutes, display);
+                    }
+                 }else if(locked == "false"){
                  $("#locked").text("Board Free!").attr("class","");
+                 $("#timer").text('');
+
+                    }
                  }
         });
         for (i = 0; i < json.length; i++) {
@@ -476,10 +500,38 @@ function myXhr(GetOrPost, d, id) {
     });
 }
 
-
-
-
 //*STYLE SCRIPPTS**//
 
 //scroll to the bottom
 //$('#chatRoom').scrollTop($('#chatRoom')[0].scrollHeight);
+
+//Timer
+function startTimer(duration, display) {
+    var start = Date.now(),
+        diff,
+        minutes,
+        seconds;
+    function timer() {
+        // get the number of seconds that have elapsed since
+        // startTimer() was called
+        diff = duration - (((Date.now() - start) / 1000) | 0);
+
+        // does the same job as parseInt truncates the float
+        minutes = (diff / 60) | 0;
+        seconds = (diff % 60) | 0;
+
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+        display.textContent = minutes + ":" + seconds;
+
+        if (diff <= 0) {
+            // add one second so that the count down starts at the full duration
+            // example 05:00 not 04:59
+            start = Date.now() + 1000;
+        }
+    };
+    // we don't want to wait a full second before the timer starts
+    timer();
+    setInterval(timer, 1000);
+}

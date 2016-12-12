@@ -26,7 +26,7 @@
     <br/>
         <h3>Welcome user!</h3>
         <div class="col-md-4 col-md-offset-8">
-            <button type="button" class="btn btn-danger">Logout</button>
+            <button type="button" class="btn btn-danger" id="logoutBtn">Logout</button>
         </div>
     </div>
     <br/>
@@ -61,6 +61,7 @@
             </div>
             <div class="col-md-6">
                <h2 id="locked"></h2>
+               <span id="timer"></span>
             </div>
         </div>
             <!--SVG GOES HERE  -->
@@ -108,7 +109,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-         <h4 class="modal-title" id="exampleModalLabel">Confirm Invition?</h4>
+         <h4 class="modal-title" id="exampleModalLabel">Confirm Invitation?</h4>
       </div>
       <div class="modal-body">
       </div>

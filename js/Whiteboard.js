@@ -86,8 +86,14 @@ var drawingTurn =0;
                 $("#locked").append(inUse);
               //  alert("NO WRITE");
             }else {
+                 if(locked == "timed"){
+                     $("#locked").text("You are drawing...");
+
+                 }else if(locked == "false"){
                  $("#locked").text("Board Free!").attr("class","");
-                //alert("LOCKING");
+                 $("#timer").text("");
+            }
+            //alert("LOCKING");
                 //ADD BUTTON TO FINISH DRAWING
                 if(!$("#clearTurn").length){
                 var endTurnBtn = document.createElement("button");
@@ -96,6 +102,8 @@ var drawingTurn =0;
                 endTurnBtn.addEventListener('click',function(){
                     checkLockStatus(boardId,1);
                     $("#clearTurn").remove();
+                    timerCheck = null;
+                 $("#timer").text("");          
                            });
                  document.getElementById("boardSpace").appendChild(endTurnBtn);
             }
