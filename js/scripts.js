@@ -3,10 +3,11 @@ var checkBoard;
 var inviteTimeout;
 var timerCheck = null;
 var timerTimeout;
+        var whiteboard = null;
 $(document).ready(function() {
     //go getChat...
     //TEMPORARLILY LOAD BOARD       name,owner,status,size, title, borderColor
-    getTurnGame();
+    checkExpiredLogin();
     checkLogin();
     $("#submitBtn").on('click', function(event) {
         checkLogin();
@@ -21,9 +22,12 @@ $(document).ready(function() {
         logout();
     });
     $("#submitNewBoard").on('click',function(event){
-        var boardName = $("#createWb >#newBoardName").val();
+        var boardName = $("#whiteboardNameInput").val();
         var publicBool = $('input[name=publicRadio]:checked', '#createWb').val();
         createBoard(boardName, publicBool);
+        $("#newBoardModal").modal("hide");
+        $("#listOfBoards").html("");
+        getBoards();
     });
     $("#confirmInvite").on('click', function(event) {
         //TODO
@@ -74,14 +78,49 @@ $(document).ready(function() {
  *
  *****************************/
 function checkLogin() {
-    var info = $("#username").val() + "|" + $("#password").val();
+    //Token
+    //UserAgent
+    //TimeDate
+    //userid
+    var userAgent = navigator.userAgent;
+    var timeNow = Date.now();
+    var userName = $("#username").val();
+
+    if(userName != null && userName != ""){
+       // alert(userAgent+"|"+timeNow+"|"+userName);
+    }
+
+    var info = $("#username").val() + "|" + $("#password").val() + "|" + userAgent;
+
+
+
+
     myXhr('get', {
         method: 'checkLoginSvs',
         a: 'login',
         data: info
     }).done(function(json) {
+        if(json[0].Error){
+            alert("BAD INPUT TRY AGAIN");
+        }else{ // No error with sanitzation
         $('#logged').html('Logged in: ' + json[0].Logged);
         var status = json[0].Logged;
+        var token = json[0].Token;
+        if($("#greetBanner")){
+            $("#greetBanner").text("Welcome " + json[0].Username);
+            $("#loggedInAs").html("Logged in as: " +json[0].Username);
+        }
+        if(token != null){
+            if(token == "Browser"){
+                if($("#tokenMessage")){
+                    $("#tokenMessage").text("We've detected a new sign on location, this location will be stored");
+                }
+            }else if(token == "Date"){
+                if($("#tokenMessage")){
+                    $("#tokenMessage").text("It's been a while since you've logged on, welcome back!");
+                }
+            }
+        }
 
         //Success
         //Fail
@@ -100,6 +139,7 @@ function checkLogin() {
             alert("Failed");
         }
         //TODO make sessions and stuff
+        }
     });
 }
 
@@ -110,7 +150,9 @@ function createLogin() {
         a: 'login',
         data: info
     }).done(function(json) {
-        alert("DONE");
+        if(json[0].Error){
+             alert("There was an error with your inputs, please fix them");
+        }
     });
 }
 
@@ -125,9 +167,17 @@ function getUserList(lobbyId) {
     }).done(function(json) {
         console.log(json);
         for (i = 0; i < json.length; i++) {
-            $("#userList").append(
+            if(json[i].status == 1){
+                //User IS online
+                     $("#userList").append(
                 "<br><span class='userListItem' data-toggle='modal' data-target='#inviteModal' data-username=" +
-                json[i].username + ">" + json[i].username + "</span><span class='owls'>"+json[i].status+"</span>");
+                json[i].username + ">" + json[i].username + "</span><div class='statusOnline'></div>");
+            }else{
+                 $("#userList").append(
+                "<br><span class='userListItem' data-toggle='modal' data-target='#inviteModal' data-username=" +
+                json[i].username + ">" + json[i].username + "</span><div class='statusOffline'></div");
+            }
+
         }
     });
 }
@@ -166,8 +216,7 @@ function getChat(lobbyId) {
         //I'm back with good data...  Do something on the page!
         var h = '';
         for (i = 0; i < json.length; i++) {
-            h += json[i].username + ' says: ' + json[i].message +
-                ' <span style="font-size:2pt;">' + json[i].time + '</span><br/>';
+            h += json[i].username + ': ' + json[i].message +'<br/>';
         }
         $("#chatRoom").html(h);
         if ($('#inputChat').css('display') == 'none') {
@@ -239,9 +288,10 @@ function checkInvites() {
         data: "null"
     }).done(function(json) {
         if(json.length == 0){
-            $("#InviteStatus").html('');
+            $("#InviteStatus").html('You have no invites yet!');
         }
         for (i = 0; i < json.length; i++) {
+            $("#InviteStatus").html("");
             //Check if already exists
             if (!document.getElementById("invite_" + json[i].name + "|" + json[i].username)) {
                 var inviteNotification = document.createElement("button");
@@ -287,9 +337,6 @@ function inviteToBoard(boardId, userId) {
  *
  *
  *****************************/
- function trueorfalse(asda){
-     return asda;
- }
 function canJoinBoard(boardId){
 if (checkChat) {
         $("#inputChat").hide();
@@ -306,7 +353,6 @@ function getBoards() {
         data: "null"
     }).done(function(json) {
         var list = $("#listOfBoards");
-        var whiteboard = null;
         // Lock Icon
 
         var ul = document.createElement("div");
@@ -341,6 +387,14 @@ function getBoards() {
         				}
         				whiteboard.create(boardId,boardName,publicBool);
         				loadBoard(boardId);
+
+                        var colorBtn = document.createElement("button");
+                        colorBtn.innerHTML = "Change Color";
+                        colorBtn.setAttribute("id","changeColor");
+                        colorBtn.setAttribute("data-toggle","modal");
+                        colorBtn.setAttribute("data-target","#colorsModal");
+                        document.getElementById("boardSpace").appendChild(colorBtn);
+
         				//Load the whiteboard chat
         				clearTimeout(checkChat);
         				getChat(lobbyId);
@@ -362,7 +416,7 @@ function createBoard(boardName, publicBool) {
         method: 'createBoardSvs',
         a: 'board',
         data: boardName+"|"+publicBool
-    }).done(function() {
+    }).done(function(json) {
     });
 }
 
@@ -376,11 +430,11 @@ function deleteBoard() {
     });
 }
 //data: gameId|userId
-function getTurnGame() {
+function checkExpiredLogin() {
     myXhr('get', {
-        method: 'getTurnSvs',
-        a: 'board',
-        data: "55|32"
+        method: 'checkExpiredLoginSvs',
+        a: 'login',
+        data: ""
     }).done(function(json) {
         $('#turn').html('Your turn: ' + json[0].turn);
         if (!json[0].turn) setTimeout(getTurnGame, 2500);
@@ -389,13 +443,12 @@ function getTurnGame() {
 //Type: Path, Square, Etc
 //Points: Points for the type
 //id: identifier board|timestamp    saveBoardStroke("path",pathData,boardId,strokeId
-function saveBoardStroke(type, points, boardId, strokeId) {
-    myXhr('get', {
+function saveBoardStroke(type, points, boardId, strokeId,color) {
+    myXhr('post', {
         method: "saveStrokeSvs",
         a: 'board',
-        data: "path" + "|" + points + "|" + boardId + "|" + strokeId
+        data: "path" + "|" + points + "|" + boardId + "|" + strokeId +"|"+color
     }).done(function(json) {
-        console.log("SAVED");
     });
 }
 
@@ -440,7 +493,7 @@ function loadBoard(boardId) {
                 "|" + json[i].strokeId);
             if (!checkExist) {
                 var board = new SvgElement(json[i].userid + "|" + json[i].boardId + "|" +
-                    json[i].strokeId, "path", json[i].points, "purple");
+                    json[i].strokeId, "path", json[i].points, json[i].color);
                 board.create();
             }
 

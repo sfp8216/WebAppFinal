@@ -17,7 +17,7 @@
 
 
   //Checks
-           $username = '';
+  $username = '';
   $password = '';
   if(!empty($_POST['username']) && !empty($_POST['password'])){
       $username =$_POST['username'];

@@ -2,21 +2,57 @@
 //include dbInfo
 require_once ( "../dbinfo.inc" );
 //include exceptions
-function checkLoginData($uName, $pWord) {
+function checkLoginData($uName, $pWord,$token) {
 //probably need 2 args, game_id and user_id?
     global $pdo;
     try {
-        $stmt = $pdo->prepare('SELECT userId, username, password FROM users where username = :username and password = :password ');
+        $stmt = $pdo->prepare('SELECT userId, username, password, lastLogin FROM users where username = :username and password = :password ');
         $stmt->execute(array( ':username' => $uName, ':password' => $pWord ));
         $count = $stmt->rowCount();
+        //Set status to Online
         if ( $count == 1 ) {
             $result = $stmt->fetch();
-            $_SESSION['Logged'] = '[{"Logged":"true","userId":"' . $result['userId'] . '"}]';
-            $stmt = $pdo->prepare('Update users set status=1 where username=:user and password=:pass');
-            $stmt->execute(array( ':user' => $uName, ':pass' => $pWord ));
-            $count = $stmt->rowCount();
-            return '[{"Logged":"success","userId":"' . $result['userId'] . '"}]';
-        }
+
+            //Check Token/Cookie
+            $incomingToken = explode("|",unTokenize($token));
+            if($result["lastLogin"] == null){
+                $stmt = $pdo->prepare('Update users set status=1, lastLogin=:token where username=:user and password=:pass');
+                $stmt->execute(array(':token'=>$token,':user' => $uName, ':pass' => $pWord ));
+                $_SESSION['Logged'] = '[{"Logged":"true","userId":"' . $result['userId'].'","Username":"'.$uName.'"}]';
+                return '[{"Logged":"true","userId":"' . $result['userId'] . '","Username":"'.$uName.'"}]';
+            }
+            $storedToken = explode("|",unTokenize($result['lastLogin']));
+
+          //Check to make sure data hasn't been tampered
+            $inl = $incomingToken[2];
+            $inf = $incomingToken[3];
+            $storel = $storedToken[2];
+            $storef = $storedToken[3];
+            $storedDate = $storedToken[1];
+            $expireDate = date("Y-m-d H:i:s", mktime(0, 0, 0, date('m'), date('d') + 5, date('Y')));
+
+            if($inl != $storel || $inf != $storef){
+                echo "Data Tamptered";
+            }else//Check user agent
+            if($storedToken[0] != $incomingToken[0]){
+                  $_SESSION['Logged'] = '[{"Logged":"true","userId":"' . $result['userId'] . '","Token":"Browser","Username":"'.$uName.'"}]';
+                  $stmt = $pdo->prepare('Update users set status=1, lastLogin=:token where username=:user and password=:pass');
+                  $stmt->execute(array(':token'=>$token,':user' => $uName, ':pass' => $pWord ));
+                  return '[{"Logged":"success","userId":"' . $result['userId'] . '","Token":"Browser","Username":"'.$uName.'"}]';
+
+            }else //Check time
+            if($storedDate > $expireDate){
+                 $_SESSION['Logged'] = '[{"Logged":"true","userId":"' . $result['userId'] . '","Token":"Date","Username":"'.$uName.'"}]';
+                 $stmt = $pdo->prepare('Update users set status=1, lastLogin=:token where username=:user and password=:pass');
+                $stmt->execute(array(':token'=>$token,':user' => $uName, ':pass' => $pWord ));
+                return '[{"Logged":"success","userId":"' . $result['userId'] . '","Token":"Date","Username":"'.$uName.'"}]';
+            }else{
+                $stmt = $pdo->prepare('Update users set status=1, lastLogin=:token where username=:user and password=:pass');
+                $stmt->execute(array(':token'=>$token,':user' => $uName, ':pass' => $pWord ));
+                $_SESSION['Logged'] = '[{"Logged":"true","userId":"' . $result['userId'].'","Username":"'.$uName.'"}]';
+                return '[{"Logged":"true","userId":"' . $result['userId'] . '","Username":"'.$uName.'"}]';
+            }
+          }
         else {
             return '[{"Logged":"fail"}]';
         }
@@ -29,7 +65,7 @@ function checkLoginData($uName, $pWord) {
 function getUserListData($lobbyId) {
     global $pdo;
     try {
-        $stmt = $pdo->prepare("SELECT username from USERS where status = 1");
+        $stmt = $pdo->prepare("SELECT username, status from USERS");
         $stmt->execute();
         return json_encode($stmt->fetchAll());
     }
@@ -55,6 +91,29 @@ function logoutData($userId) {
         return '[{"Logout":"Success"}]';
     }
 }
+
+//"Cron" job to help clear out inactive accounts
+function checkExpiredLoginData(){
+    global $pdo;
+    $sql = "SELECT * from users where status = 1";
+    if($stmt=$pdo->prepare($sql)){
+        $stmt->execute();
+        $result = $stmt->fetchAll();
+        foreach($result as $suspectUsers){           
+            $lastLogin = explode("|",unTokenize($suspectUsers["lastLogin"]))[1];
+            $timeout_time = strtotime("+30 minutes",$date);
+            $time_now = strtotime("now");
+            if($time_now < $timeout_time){
+                $sql = "UPDATE users set STATUS = 0 WHERE userId=?";
+                if($stmt=$pdo->prepare($sql)){
+                    $stmt->bindParam(1,$suspectUsers["userId"]);
+                    $stmt->execute();
+                }
+            }
+        }
+    }
+}
+
 /*********************************Utilities*********************************/
 /*************************
 returnJson

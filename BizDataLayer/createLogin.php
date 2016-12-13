@@ -12,10 +12,11 @@
             $stmt->bindParam(':pass', $pWord);
             $stmt->execute();
           $count = $stmt->rowCount();
-          echo $count;
+
           if($count == 1){
               return '[{"Create":"success"}]';
           }else{
+              var_dump($count);
               return '[{"Create":"fail"}]';
           }
         }catch(Exception $e){
@@ -25,7 +26,7 @@
         }
     }
 
-
+         
 /*********************************Utilities*********************************/
 /*************************
     returnJson

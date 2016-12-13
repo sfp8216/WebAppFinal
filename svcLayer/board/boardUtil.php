@@ -4,7 +4,8 @@ require_once ( 'BizDataLayer/boardData.php' );
 
 function getBoardsSvs(){
     //SECURITY
-    echo(getBoardsData());
+    $userId = checkSession();
+    echo(getBoardsData($userId));
 }
 function lockBoardSvs($data){
     $boardId = $data;
@@ -33,8 +34,9 @@ $userId = checkSession();
     $points = $h[1];
     $boardId = $h[2];
     $strokeId = $h[3];
+    $color = $h[4];
 
-    echo (saveStrokeData($type,$points,$boardId, $strokeId, $userId));
+    echo (saveStrokeData($type,$points,$boardId, $strokeId, $userId,$color));
 }
 function loadBoardSvs($boardId) {
 //$data: gameId|userId

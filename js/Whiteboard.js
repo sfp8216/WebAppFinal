@@ -1,5 +1,5 @@
 var svgns="http://www.w3.org/2000/svg";
-
+var color = "black";
 function Whiteboard(name,owner,publicBool,size, title, borderColor, parent){
     this.name = name;
     this.owner = owner;
@@ -9,10 +9,10 @@ function Whiteboard(name,owner,publicBool,size, title, borderColor, parent){
     this.title = title;
     this.borderColor = borderColor;
     this.parent = parent;
+    this.color = "black"
 }
 
 Whiteboard.prototype={
-
  create:function(boardId,title, publicBool){
   var whiteboard = document.createElementNS(svgns,"svg");
     whiteboard.setAttributeNS(null,"width",this.width);
@@ -36,6 +36,10 @@ Whiteboard.prototype={
     });
     document.getElementById(this.parent).appendChild(button);
 
+
+
+
+
     //Add the drawing listeners
 
     //Check here if private or public
@@ -50,7 +54,12 @@ Whiteboard.prototype={
     }
     */
 
+ },
+ changeColor:function(newColor){
+    color = newColor;
+    console.log("OWLS" + color);
  }
+
 }
       /*SVG*/
 var svgns="http://www.w3.org/2000/svg";
@@ -83,17 +92,16 @@ var drawingTurn =0;
                 $("#locked").text("Board in use please wait!").attr("class","");
                 var inUse = document.createElement("span");
                 inUse.setAttribute("class","glyphicon glyphicon-pencil");
+                inUse.setAttribute("class","glyphicon glyphicon-pencil");
                 $("#locked").append(inUse);
               //  alert("NO WRITE");
             }else {
                  if(locked == "timed"){
                      $("#locked").text("You are drawing...");
-
                  }else if(locked == "false"){
                  $("#locked").text("Board Free!").attr("class","");
                  $("#timer").text("");
             }
-            //alert("LOCKING");
                 //ADD BUTTON TO FINISH DRAWING
                 if(!$("#clearTurn").length){
                 var endTurnBtn = document.createElement("button");
@@ -110,11 +118,13 @@ var drawingTurn =0;
                    svgPath =  document.createElementNS("http://www.w3.org/2000/svg","path");
                     svgPath.setAttribute("fill", "none");
                     svgPath.setAttribute("stroke-linejoin", "round");
-                    svgPath.setAttribute("stroke", "blue");
+                    svgPath.setAttribute("stroke", color);
                     svgPath.setAttribute("d", "M" + event.offsetX  + "," + event.offsetY);
                     svgCanvas.appendChild(svgPath);
                     lockBoard(boardId);
             }
+            //Add Tools Buttons
+
         });
 
     }
@@ -134,6 +144,11 @@ var drawingTurn =0;
             var pathData = svgPath.getAttribute("d");
             pathData = pathData + " L" + event.offsetX + "," + event.offsetY;
             svgPath.setAttribute("d", pathData);
+            //Max length is 3000
+            if(svgPath.getAttribute("d").length > 3000){
+                endDrawTouch(event);
+                      pathData="";
+            }
         }
     }
     function endDrawTouch(event){
@@ -148,7 +163,8 @@ var drawingTurn =0;
             var boardId = document.getElementsByTagName("svg")[0].getAttribute("data-id");
             var strokeId = new Date().valueOf();
             svgPath.setAttribute("id","2|"+boardId+"|"+strokeId);
-            saveBoardStroke("path",pathData,boardId,strokeId);
+            console.log("saving as..." + color);
+            saveBoardStroke("path",pathData,boardId,strokeId,color);
             svgPath = null;
         }
     }

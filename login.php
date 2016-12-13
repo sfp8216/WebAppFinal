@@ -15,10 +15,12 @@
   <script type="text/javascript" src="js/SvgElement.js"></script>
   <script type="text/javascript" src="js/Whiteboard.js"></script>
   <script type="text/javascript" src="js/scripts.js"></script>
+<script type="text/javascript" src="js/uiStyles.js"></script>
   <title>TeachBoard - Login!</title>
 </head>
 <body class="container">
-  <div class="text-center">
+    <div class="whBg">
+  <div class="text-center ">
     <h1>TeachBoard - The Syncable Whiteboard App!</h1><br>
     <br>
 
@@ -26,41 +28,43 @@
   </div><br>
   <br>
 
-  <div class="row">
+  <div class="row ">
     <div class="col-md-2 col-md-offset-4">
-      <button type="button" class="btn btn-primary">Login</button>
+      <button type="button" class="btn btn-primary" id="toggleLogin">Login</button>
     </div>
 
-    <div class="col-md-2">
-      <button type="button" class="btn btn-primary">Create Account</button>
+    <div class="col-md-2 ">
+      <button type="button" class="btn btn-primary" id="toggleCreate">Create Account</button>
     </div>
   </div><br>
   <br>
 
-  <div class="row">
-    <div id="createForm" class="col-md-6 col-md-offset-4">
-      Login!
-
+  <div class="row ">
+      <div class="col-md-4"></div>
+    <div id="loginForm" class="col-md-4 formWBorder">
+      Login:
       <form method="post" id="login" name="login" class="form-inline">
-        <span>Username:</span><input type="text" name="username" id="username" class="form-control"><br>
-        <span>Password:</span><input type="password" name="password" id="password" class="form-control"><br>
-        <button type="button" class="btn btn-primary" name="submitBtn" id="submitBtn">Login</button><button type="reset" class="btn btn-warning">Reset</button>
+        <span  class="col-md-4">Username:</span><input type="text" name="username" id="username" class="form-control col-md-8"><br>
+        <span class="col-md-4">Password:</span><input type="password" name="password" id="password" class="form-control col-md-8"><br><br><br>
+        <button type="button" class="btn btn-primary col-md-2" name="submitBtn" id="submitBtn">Login</button>
+        <button type="reset" class="btn btn-warning col-md-2 col-md-offset-8">Reset</button>
       </form>
     </div>
-  </div><br>
-  <br>
-  <br>
-
-  <div class="row">
-    <div id="createForm" class="col-md-6 col-md-offset-4">
-      Create An Account!
-
-      <form method="post" id="createLogin" name="createLogin" class="form-inline">
-        <span>Username:</span><input type="text" name="newUser" id="newUser" class="form-control"><br>
-        <span>Password:</span><input type="password" name="newPass" id="newPass" class="form-control"><br>
-        <button type="button" name="submitBtn" id="newUserBtn" class="btn btn-success">Create</button><button type="reset" class="btn btn-warning">Reset</button>
+  </div>
+  <div class="row ">
+       <div class="col-md-4"></div>
+    <div id="createForm" class="col-md-4 formWBorder ">
+      Account Creation:
+      <form method="post" id="createLogin" name="createLogin" class="form-inline ">
+        <span  class="col-md-4">Username:</span><input type="text" name="newUser" id="newUser" class="form-control col-md-8"><br>
+        <span  class="col-md-4">Password:</span><input type="password" name="newPass" id="newPass" class="form-control col-md-8"><br><br>
+        <button type="button" name="submitBtn" id="newUserBtn" class="btn btn-success col-md-3">Create</button><button type="reset" class="btn btn-warning col-md-2 col-md-offset-7">Reset</button>
       </form>
     </div>
+  </div>
+  <br>
+  <br>
+  <br>
   </div>
 </body>
 </html>

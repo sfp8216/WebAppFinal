@@ -14,49 +14,55 @@
 <script type="text/javascript" src="js/Whiteboard.js"></script>
 <script type="text/javascript" src="js/SvgElement.js"></script>
 <script type="text/javascript" src="js/scripts.js"></script>
+<script type="text/javascript" src="js/uiStyles.js"></script>
+
 
 <link rel="stylesheet" href="css/styles.css" />
 
-  <title>TeachBoard - Login!</title>
+  <title>TeachBoard - Board!</title>
 </head>
 <body class="container">
-    <div class="text-center row">
+    <div class="text-center row whBg">
         <h1>TeachBoard - The Syncable Whiteboard App!</h1>
     <br/>
     <br/>
-        <h3>Welcome user!</h3>
-        <div class="col-md-4 col-md-offset-8">
+        <h3 id="greetBanner">Welcome user!</h3>
+        <h5 id="tokenMessage"></h5>
+           <!--Whiteboard create -->
+         <div class="col-md-4">
+            <button class="btn btn-success"  data-toggle='modal' data-target='#newBoardModal'>Create a new Whiteboard!</button>
+            <button class="btn btn-success"  data-toggle='modal' data-target='#newBoardModal'>Help</button>
+        </div>
+          <div class="col-md-2 col-md-offset-4 text-right" id="loggedInAs">
+            Logged in as: user
+        </div>
+        <div class="col-md-2">
             <button type="button" class="btn btn-danger" id="logoutBtn">Logout</button>
         </div>
     </div>
-    <br/>
-    <br/>
-    <div class="row">
+    <div class="row whBg">
         <!--Whiteboard class -->
-    <div class="col-md-6">
-    <h2>List of Whiteboards!</h2>
+    <div class="col-md-6 whBg">
+    <h2>Whiteboards:</h2>
         <!--Whiteboard list -->
         <div class="col-md-8" id="listOfBoards">
+        </div>
 
-        </div>
-        <!--Whiteboard create -->
-         <div class="col-md-2">
-            <button class="btn btn-success">Create a new Whiteboard!</button>
-        </div>
     </div>
     <!--Invites  -->
-    <div class="col-md-6 text-right">
+    <div class="col-md-6 text-center">
         <h2>Pending Invites</h2>
             <!--Invites go here  -->
         <div id="InviteStatus">
+        You have no pending invites.
         </div>
     </div>
     </div>
-<br>
     <!--WHITEBOARD DIV-->
-    <div class="row" style="border:1px solid black;">
+    <div class="row whBg" id="whiteboardDiv">
+    <hr/>
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-5 col-md-offset-1">
                 <h2 id="whiteBoardName">Select a Whiteboard to continue!</h2>
             </div>
             <div class="col-md-6">
@@ -65,26 +71,26 @@
             </div>
         </div>
             <!--SVG GOES HERE  -->
-        <div class="col-md-7" style="border:1px solid black;" id="boardSpace">
+        <div class="col-md-7" id="boardSpace">
         </div>
             <!--CHAT STUFF  -->
-        <div class="col-md-5" style="border:1px solid black;">
+        <div class="col-md-5 chatDiv">
             <div class="row">
-                <div class="col-md-5">
+                <div class="col-md-6">
                     Chat Room:
                 </div>
-                <div class="col-md-4">
-                    Users In Room:
+                <div class="col-md-3">
+                    In Room:
                 </div>
                 <div class="col-md-3">
                     All Users:
                 </div>
             </div>
-            <div class="col-md-8 chatOverFlow" id="chatRoom">
+            <div class="col-md-6 chatOverFlow" id="chatRoom">
             </div>
-            <div class="col-md-2 chatOverFlow" id="chatRoomUsers">
+            <div class="col-md-3 chatOverFlow" id="chatRoomUsers">
             </div>
-            <div class="col-md-2 chatOverFlow" id="userList">
+            <div class="col-md-3 chatOverFlow" id="userList">
             </div>
         <div class="col-md-12">
               <form method="post" name="postChat" id="inputChat" style="display:none;">
@@ -135,6 +141,67 @@
         <button type="button" class="btn btn-success" id="acceptBoardInviteBtn">Accept</button>
         <button type="button" class="btn btn-danger" id="denyBoardInviteBtn">Deny</button>
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="newBoardModal" class="modal fade" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="exampleModalLabel">Create new Whiteboard</h4>
+      </div>
+      <div class="modal-body">
+        <form  id="createWb" name="createWb"  class="form-horizontal">
+          <div class="form-group">
+            <label for="whiteboardNameInput" id="newBoardName" class="col-sm-2 control-label">Board Name:</label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" id="whiteboardNameInput" placeholder="Your Whiteboard">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="privacyRadio" class="col-sm-2 control-label">Privacy</label>
+            <div class="col-sm-10">
+               <label class="radio-inline"><input type="radio" name="publicRadio" checked value=1>Public</label>
+               <label class="radio-inline"><input type="radio" name="publicRadio" value=0>Private</label><br>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+               <button id="submitNewBoard" name="submitNewBoard" class="btn btn-success" type="button">Create</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="colorsModal" class="modal colorModal fade" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title text-center">Select a Color</h4>
+      </div>
+      <div class="modal-body">
+          <div class="row">
+          <div class=" col-md-4"><div class="pickColor" data-dismiss="modal" style="background:Red";>RED</div></div>
+          <div class=" col-md-4"><div class="pickColor" data-dismiss="modal" style="background:ORANGE";>ORANGE</div></div>
+          <div class=" col-md-4"><div class="pickColor" data-dismiss="modal" style="background:YELLOW";>YELLOW</div></div>
+          </div>
+          <div class="row">
+          <div class=" col-md-4"><div class="pickColor" data-dismiss="modal" style="background:GREEN";>GREEN</div></div>
+          <div class=" col-md-4"><div class="pickColor" data-dismiss="modal" style="background:BLUE";>BLUE</div></div>
+          <div class=" col-md-4"><div class="pickColor" data-dismiss="modal" style="background:PURPLE";>PURPLE</div></div>
+          </div>
+          <div class="row">
+          <div class=" col-md-4"><div class="pickColor" data-dismiss="modal" style="background:BLACK";>BLACK</div></div>
+          <div class=" col-md-4"><div class="pickColor" data-dismiss="modal" style="background:WHITE";>WHITE</div></div>
+          <div class=" col-md-4"><div class="pickColor" data-dismiss="modal" style="background:GREY";>GREY</div></div>
+          </div>
       </div>
     </div>
   </div>
