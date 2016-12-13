@@ -10,8 +10,7 @@ function getChatLobbiesData() {
 	try {
 		if($stmt = $pdo->prepare($sql)) {
 			echo returnJson($stmt);
-			$stmt->close();
-			$pdo->close();
+
 		}
 		else
 			if(!$data) {
@@ -30,8 +29,7 @@ function getChatUsersData($lobbyId) {
 		if($stmt = $pdo->prepare($sql)) {
 			$stmt->bindParam(1, $lobbyId);
 			echo returnJson($stmt);
-			$stmt->close();
-			$pdo->close();
+
 		}
 	}
 	catch (Exception $e) {
@@ -40,13 +38,11 @@ function getChatUsersData($lobbyId) {
 }
 function getChatData($lobbyId) {
 	global $pdo;
-	$sql = "Select lobbyId, username, time, message from chatdata INNER JOIN users on chatdata.userId=users.userId WHERE chatdata.lobbyId=? ORDER BY time";
+	$sql = "Select lobbyId, username, message, messageTime from chatdata INNER JOIN users on chatdata.userId=users.userId WHERE chatdata.lobbyId=? ORDER BY messageTime";
 	try {
 		if($stmt = $pdo->prepare($sql)) {
-			$stmt->bindParam(1, $lobbyId, PDO::PARAM_STR);
-			echo returnJson($stmt);
-			$stmt->close();
-			$pdo->close();
+		$stmt->bindParam(1, $lobbyId, PDO::PARAM_STR);
+		  echo returnJson($stmt);
 		}
 		else
 			if(!$data) {
@@ -60,14 +56,13 @@ function getChatData($lobbyId) {
 }
 function sendChatData($lobby, $user, $message) {
 	global $pdo;
-	$sql = "Insert into chatdata (lobbyId, userId, message, time) VALUES (:lobby, :userId, :message, :time)";
+	$sql = "Insert into chatdata (lobbyId, userId, message, messageTime) VALUES (:lobby, :userId, :message, :time)";
 	try {
 		if($stmt = $pdo->prepare($sql)) {
 			$timenow = new DateTime();
 			$timenow->format('Y-m-d H:i:s');
 			$stmt->execute(array(':lobby' => $lobby, ':userId' => $user, ':message' => $message, ':time' => $timenow->format('Y-m-d H:i:s')));
-			$stmt->close();
-			$pdo->close();
+
 		}
 		else
 			if(!$data) {

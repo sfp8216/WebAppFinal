@@ -47,14 +47,15 @@ function getBoardsData($userId) {
 }
 function checkLockData($boardId, $overwrite, $userId) {
 	global $pdo;
-	$sql = "SELECT Locked, Timelock, UserId FROM WHITEBOARD WHERE BOARDID = ?";
+	$sql = "SELECT locked, timelock, userId FROM whiteboard WHERE boardId = ?";
 	try {
 		if($stmt = $pdo->prepare($sql)) {
 			$stmt->bindParam(1, $boardId);
 			$stmt->execute();
-			$results = $stmt->fetchAll(PDO::FETCH_ASSOC) [0];
-			$timelock = $results["Timelock"];
-			$lockedToUser = $results["UserId"];
+			$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $results = $results[0];
+			$timelock = $results["timelock"];
+			$lockedToUser = $results["userId"];
 			$timeNow = new DateTime();
 			$timeOUT = new DateTime($timelock);
 			$timeOUT->modify("+ 30 Seconds");
@@ -64,7 +65,7 @@ function checkLockData($boardId, $overwrite, $userId) {
 					if($timeNow > $timeOUT) {
 						// the time expired
 						// Update the board with null status and return locked false
-						$sql = "UPDATE whiteboard set Locked = null, Timelock = null, userid = null where boardid = ?";
+						$sql = "UPDATE whiteboard set locked = null, timelock = null, userId = null where boardId = ?";
 						if($stmt = $pdo->prepare($sql)) {
 							$stmt->bindParam(1, $boardId);
 							$stmt->execute();
@@ -95,8 +96,6 @@ function checkLockData($boardId, $overwrite, $userId) {
 					return '[{"Locked":"false"}]';
 				}
 			}
-			$stmt->close();
-			$pdo->close();
 		}
 	}
 	catch (Exception $e) {
@@ -113,8 +112,6 @@ function lockBoardData($boardId, $userId) {
 			$stmt->bindParam(2, $date->format('Y-m-d  H:i:s'));
 			$stmt->bindParam(3, $boardId);
 			$stmt->execute();
-			$stmt->close();
-			$pdo->close();
 			return '[{"Locked":"true"}]';
 		}
 	}
@@ -128,7 +125,7 @@ function createBoardData($name, $owner, $public) {
 	global $pdo;
 	$sql = "INSERT INTO chatlobby  (ownerId, name, public) VALUES(?,?,?);
     INSERT INTO whiteboard (ownerId, lobbyId, name, public) SELECT ?, lobbyId, ?, ? FROM chatlobby where name = ?;
-    INSERT INTO CHATUSERS (lobbyid,userid) SELECT lobbyId, ownerId FROM chatlobby where name = ?";
+    INSERT INTO chatusers (lobbyId,userId) SELECT lobbyId, ownerId FROM chatlobby where name = ?";
 	try {
 		if($stmt = $pdo->prepare($sql)) {
 			$stmt->bindParam(1, $owner, PDO::PARAM_INT);
@@ -180,8 +177,6 @@ function saveStrokeData($type, $points, $boardId, $strokeId, $userId, $color, $b
 			$stmt->bindParam(6, $color);
 			$stmt->bindParam(7, $brushSize);
 			$stmt->execute();
-			$stmt->close();
-			$pdo->close();
 		}
 		else
 			if(!$points) {
@@ -200,8 +195,6 @@ function loadBoardData($boardId) {
 		if($stmt = $pdo->prepare($sql)) {
 			$stmt->bindParam(1, $boardId);
 			echo returnJson($stmt);
-			$stmt->close();
-			$pdo->close();
 		}
 		else
 			if(!$data) {
@@ -220,8 +213,6 @@ function clearBoardData($boardId) {
 		if($stmt = $pdo->prepare($sql)) {
 			$stmt->bindParam(1, $boardId);
 			echo returnJson($stmt);
-			$stmt->close();
-			$pdo->close();
 		}
 	}
 	catch (Exception $e) {
@@ -229,7 +220,7 @@ function clearBoardData($boardId) {
 	}
 }
 function inviteToBoardData($boardId, $userId, $inviter) {
-	global $pdo;                             
+	global $pdo;
 	try {
 		$sql = "SELECT userid from users where username = ?";
 		if($stmt = $pdo->prepare($sql)) {
@@ -250,8 +241,6 @@ function inviteToBoardData($boardId, $userId, $inviter) {
 			$stmt->bindParam(3, $inviter);
 			$stmt->bindParam(4, $userId);
 			$stmt->execute();
-			$stmt->close();
-			$pdo->close();
 		}
 	}
 	catch (Exception $e) {
@@ -260,14 +249,15 @@ function inviteToBoardData($boardId, $userId, $inviter) {
 }
 function acceptBoardInviteData($boardName, $inviter, $invitee) {
 	global $pdo;
-	$sql = "UPDATE invites inv INNER JOIN whiteboard wb ON wb.boardid = inv.boardid SET accepted = 1 Where wb.name = ? AND inv.invitee = ?;";
-	$sql .= "INSERT INTO CHATUSERS (lobbyid,userid) values (?,?)";
+	$sql = "UPDATE invites inv INNER JOIN whiteboard wb ON wb.boardId = inv.boardId SET accepted = 1 Where wb.name = ? AND inv.invitee = ?;";
+	$sql .= "INSERT INTO chatusers (lobbyId,userId) values (?,?)";
 	try {
 		$getboardId = "SELECT * from whiteboard where name = ?";
 		if($stmt = $pdo->prepare($getboardId)) {
 			$stmt->bindParam(1, $boardName);
 			$stmt->execute();
-			$boardRow = $stmt->fetchAll(PDO::FETCH_ASSOC) [0];
+			$boardRow = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $boardRow = $boardRow[0];
 		}
 		if($stmt = $pdo->prepare($sql)) {
 			$stmt->bindParam(1, $boardName);
@@ -289,7 +279,8 @@ function canJoinBoardData($boardId, $userId) {
 		if($stmt = $pdo->prepare($sql)) {
 			$stmt->bindParam(1, $boardId);
 			$stmt->execute();
-			$results = $stmt->fetchAll(PDO::FETCH_ASSOC) [0];
+			$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $results = $results[0];
 			if($results["public"] == 1) {
 				//It is public
 				//Add user to the chatRoom but first check if they are already there
@@ -338,8 +329,6 @@ function canJoinBoardData($boardId, $userId) {
                             }
 							return '[{"allowed":false,"Owner":"false"}]';
 					}
-					$stmt->close();
-					$pdo->close();
 				}
 			}
 		}

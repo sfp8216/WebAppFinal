@@ -64,9 +64,10 @@ function checkLoginData($uName, $pWord, $token) {
 function getUserListData($lobbyId) {
 	global $pdo;
 	try {
-		$stmt = $pdo->prepare("SELECT username, status from USERS");
+		$stmt = $pdo->prepare("SELECT username, status from users");
 		$stmt->execute();
-		return json_encode($stmt->fetchAll());
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		return json_encode($result);
 	}
 	catch (Exception $e) {
 	   return '[{"Error":"GetUserList"}]';
@@ -97,7 +98,8 @@ function checkExpiredLoginData() {
 		$stmt->execute();
 		$result = $stmt->fetchAll();
 		foreach($result as $suspectUsers) {
-			$lastLogin = explode("|", unTokenize($suspectUsers["lastLogin"])) [1];
+			$lastLogin = explode("|", unTokenize($suspectUsers["lastLogin"]));
+            $lastLogin = $lastLogin[1];
 			$timeout_time = date(strtotime($lastLogin));
 			$timeout_time = (strtotime("+2 hours", $timeout_time));
 			$time_now = strtotime("now");

@@ -76,11 +76,17 @@ overflow-x:hidden;
     height:40px;
 }
 .formWBorder{
-border:2px solid blue;
-border-radius:5%;
-padding:25px;
-background:#B6BDD3;
+    border:2px solid blue;
+    border-radius:5%;
+    padding-top:25px;
+    padding-left:25px;
+    padding-bottom:25px;
+    background:#B6BDD3;
 }
+#username, #password, #newUser, #newPass{
+    width:100%;
+}
+
 .chatDiv{
 background:#DBDCFF;
 min-height:400px;

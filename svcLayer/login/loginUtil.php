@@ -1,5 +1,5 @@
 <?php
-require_once ("svcLayer/security//security.php");
+require_once ("svcLayer/security/security.php");
 function tokenize($userAgent, $lAndF) {
 	//First MD5 encrypt the useragent
 	//"Minify" user agent by getting every other char
@@ -103,7 +103,7 @@ function createLoginSvs($data) {
 }
 function getUserListSvs($data) {
 	$lobbyId = $data;
-	require_once ('BizDataLayer/checkLogin.php');
+	require_once ('BizDataLayer/checkLogin.php');   
 	echo (getUserListData($data));
 }
 function logoutSvs($data, $ip, $token) {

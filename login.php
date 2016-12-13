@@ -40,23 +40,23 @@
   <div class="row ">
       <div class="col-md-4"></div>
     <div id="loginForm" class="col-md-4 formWBorder">
-      Login:
+      <h2 class="text-center">Login:</h2>
       <form method="post" id="login" name="login" class="form-inline">
         <span  class="col-md-4">Username:</span><input type="text" name="username" id="username" class="form-control col-md-8"><br>
         <span class="col-md-4">Password:</span><input type="password" name="password" id="password" class="form-control col-md-8"><br><br><br>
-        <button type="button" class="btn btn-primary col-md-2" name="submitBtn" id="submitBtn">Login</button>
-        <button type="reset" class="btn btn-warning col-md-2 col-md-offset-8">Reset</button>
+        <button type="button" class="btn btn-primary col-md-4" name="submitBtn" id="submitBtn">Login</button>
+        <button type="reset" class="btn btn-warning col-md-4 col-md-offset-4">Reset</button>
       </form>
     </div>
   </div>
   <div class="row ">
        <div class="col-md-4"></div>
     <div id="createForm" class="col-md-4 formWBorder ">
-      Account Creation:
+    <h2 class="text-center">Account Creation:</h2>
       <form method="post" id="createLogin" name="createLogin" class="form-inline ">
-        <span  class="col-md-4">Username:</span><input type="text" name="newUser" id="newUser" class="form-control col-md-8"><br>
-        <span  class="col-md-4">Password:</span><input type="password" name="newPass" id="newPass" class="form-control col-md-8"><br><br>
-        <button type="button" name="submitBtn" id="newUserBtn" class="btn btn-success col-md-3">Create</button><button type="reset" class="btn btn-warning col-md-2 col-md-offset-7">Reset</button>
+        <span  class="col-md-4">Username:</span><input type="text" name="newUser" id="newUser" class="form-control col-md-8" autocorrect="off"><br>
+        <span  class="col-md-4">Password:</span><input type="password" name="newPass" id="newPass" class="form-control col-md-8" autocorrect="off"><br><br>
+        <button type="button" name="submitBtn" id="newUserBtn" class="btn btn-success col-md-4">Create</button><button type="reset" class="btn btn-warning col-md-4 col-md-offset-4">Reset</button>
       </form>
     </div>
   </div>

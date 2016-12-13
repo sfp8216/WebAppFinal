@@ -471,10 +471,8 @@ function loadBoard(boardId) {
                     var locked = json[0].Locked;
                     //if it is locked
                     if (locked == "true") {
-                        $("#locked")
-                            .text("Board in use please wait!")
-                            .attr("class", "");
-                            $("#toolBar button").prop("disabled",true);
+                        $("#locked").text("Board in use please wait!").attr("class", "");
+                        $("#toolBar button").prop("disabled",true);
                         var inUse = document.createElement("span");
                         inUse.setAttribute("class", "glyphicon glyphicon-pencil");
                         $("#locked").append(inUse);

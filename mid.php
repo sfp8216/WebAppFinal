@@ -1,5 +1,5 @@
 <?php
-	//all XHR calls for chat or game go through here
+	//all XHR calls for chat or game go through here                   
 	//things sent in: 
 	//	a - area (within the service layer - chat, game, etc)
 	//	method - function to call (in the service layer folder)
