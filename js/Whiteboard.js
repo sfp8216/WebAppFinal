@@ -1,5 +1,6 @@
 var svgns="http://www.w3.org/2000/svg";
 var color = "black";
+var brushWidth = 5;
 function Whiteboard(name,owner,publicBool,size, title, borderColor, parent){
     this.name = name;
     this.owner = owner;
@@ -9,7 +10,8 @@ function Whiteboard(name,owner,publicBool,size, title, borderColor, parent){
     this.title = title;
     this.borderColor = borderColor;
     this.parent = parent;
-    this.color = "black"
+    this.color = "black";
+    this.brushWidth = 5;
 }
 
 Whiteboard.prototype={
@@ -26,46 +28,28 @@ Whiteboard.prototype={
 
     $("#whiteBoardName").html(title);
     document.getElementById(this.parent).appendChild(whiteboard);
-    var button = document.createElement("button");
-    button.innerHTML = "Clear Board";
-    button.addEventListener('click',function(){
-        myXhr('get',{method:'clearBoardSvs',a:'board',data:boardId}).done(function(){
-            alert("Cleared");
-            loadBoardData(boardId);
-        });
-    });
-    document.getElementById(this.parent).appendChild(button);
-
-
-
-
-
-    //Add the drawing listeners
-
-    //Check here if private or public
-    //If private then...
-    //InitPrivate();
-
     init(this.name);
-    /*if(publicBool == 1){
-             init(this.name);
-    }else{
-        initPrivate(this.name);
-    }
-    */
-
  },
  changeColor:function(newColor){
     color = newColor;
-    console.log("OWLS" + color);
+ },
+ increaseBrush:function(){
+     if(brushWidth < 50){
+         brushWidth = brushWidth+5;
+     }
+ },
+ decreaseBrush:function(){
+     if(brushWidth > 2){
+         brushWidth = brushWidth-4;
+     }
  }
 
 }
-      /*SVG*/
+/*SVG*/
 var svgns="http://www.w3.org/2000/svg";
 var svgCanvas;
 var svgPath;
-var drawingTurn =0;
+var drawingTurn = 0;
     function init(id){
         svgCanvas= document.getElementById(id);
         svgCanvas.addEventListener("mousedown", startDrawTouch, false);
@@ -74,7 +58,6 @@ var drawingTurn =0;
     }
 
     function initPrivate(id){
-        //TODO MAKE PRIVATE CHECK TURN BASED EVENTYLISTENERS
         svgCanvas= document.getElementById(id);
         svgCanvas.addEventListener("mousedown", startDrawTouchPrivate, false);
         svgCanvas.addEventListener("mousemove", continueDrawTouchPrivate, false);
@@ -85,21 +68,21 @@ var drawingTurn =0;
         //Need boardId and userId
         var boardId = $("svg").attr("data-id");
         myXhr("get",{method:"checkLockSvs",a:"board",data:boardId+"|null"}).done(function(json){
-          //  alert(json[0].Locked);
             var locked= json[0].Locked;
             //if it is locked
                 if(locked == "true"){
                 $("#locked").text("Board in use please wait!").attr("class","");
+                $("#toolBar button").prop("disabled",true);
                 var inUse = document.createElement("span");
                 inUse.setAttribute("class","glyphicon glyphicon-pencil");
                 inUse.setAttribute("class","glyphicon glyphicon-pencil");
                 $("#locked").append(inUse);
-              //  alert("NO WRITE");
             }else {
                  if(locked == "timed"){
                      $("#locked").text("You are drawing...");
                  }else if(locked == "false"){
                  $("#locked").text("Board Free!").attr("class","");
+                 $("#toolBar button").prop("disabled",false);
                  $("#timer").text("");
             }
                 //ADD BUTTON TO FINISH DRAWING
@@ -107,29 +90,49 @@ var drawingTurn =0;
                 var endTurnBtn = document.createElement("button");
                 endTurnBtn.innerHTML = "Finish Turn";
                 endTurnBtn.setAttribute("id","clearTurn");
+                endTurnBtn.setAttribute("class","btn btn-success col-md-12");
                 endTurnBtn.addEventListener('click',function(){
                     checkLockStatus(boardId,1);
                     $("#clearTurn").remove();
                     timerCheck = null;
                  $("#timer").text("");          
                            });
-                 document.getElementById("boardSpace").appendChild(endTurnBtn);
+                 document.getElementById("pHforFinish").appendChild(endTurnBtn);
             }
                    svgPath =  document.createElementNS("http://www.w3.org/2000/svg","path");
                     svgPath.setAttribute("fill", "none");
                     svgPath.setAttribute("stroke-linejoin", "round");
                     svgPath.setAttribute("stroke", color);
-                    svgPath.setAttribute("d", "M" + event.offsetX  + "," + event.offsetY);
+                    svgPath.setAttribute("stroke-width",brushWidth);
+                    event=normalizeForFireFox(event);
+                    svgPath.setAttribute("d", "M" + (event.layerX) + "," + (event.layerY));
                     svgCanvas.appendChild(svgPath);
                     lockBoard(boardId);
             }
-            //Add Tools Buttons
 
         });
 
     }
-
+    function normalizeForFireFox(event) {
+    if (!event.hasOwnProperty('offsetX')) {
+        var curleft = curtop = 0;
+        if (event.offsetParent) {
+           var obj=event;
+           do {
+              curleft += obj.offsetLeft;
+              curtop += obj.offsetTop;
+           } while (obj = obj.offsetParent);
+        }
+        event.offsetX=event.layerX-curleft;
+        event.offsetY=event.layerY-curtop;
+    }
+    return event;
+}
     function checkLockStatus(boardId,override){
+
+        //Also refresh the userlist
+        $("#userList").html("");
+        getUserList();
           return myXhr('get',{method:'checkLockSvs',a:'board',data:boardId+"|"+override}).done(function(json){
 
                     });
@@ -142,7 +145,8 @@ var drawingTurn =0;
     function continueDrawTouch(event){
     if (svgPath){
             var pathData = svgPath.getAttribute("d");
-            pathData = pathData + " L" + event.offsetX + "," + event.offsetY;
+            event=normalizeForFireFox(event);
+            pathData = pathData + " L" + event.layerX + "," + event.layerY;
             svgPath.setAttribute("d", pathData);
             //Max length is 3000
             if(svgPath.getAttribute("d").length > 3000){
@@ -155,16 +159,14 @@ var drawingTurn =0;
     if (svgPath){
         drawingTurn++;
             var pathData = svgPath.getAttribute("d");
-            pathData = pathData + " L" + event.offsetX + "," + event.offsetY;
+            event=normalizeForFireFox(event);
+            pathData = pathData + " L" + event.layerX + "," + event.layerY;
             svgPath.setAttribute("d", pathData);
-            //Hardcoded boardId|userId|Turn
-
-            //Get dynamic id
+            // boardId|userId|Turn
             var boardId = document.getElementsByTagName("svg")[0].getAttribute("data-id");
             var strokeId = new Date().valueOf();
             svgPath.setAttribute("id","2|"+boardId+"|"+strokeId);
-            console.log("saving as..." + color);
-            saveBoardStroke("path",pathData,boardId,strokeId,color);
+            saveBoardStroke("path",pathData,boardId,strokeId,color,brushWidth);
             svgPath = null;
         }
     }

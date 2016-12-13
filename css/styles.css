@@ -1,7 +1,15 @@
+/*FONTS*/
+@font-face {
+  font-family: 'PermanentMarker';
+  src:  url('PermanentMarker.ttf'); /* IE9 Compat Modes */
+  src: local('PermanentMarker'),local('PermanentMarker'),url('fonts/PermanentMarker.ttf') format('truetype')
+}
+
 body {
     padding-top: 5rem;
     background-image: url("img/green_cup.png");
-}
+    font-family:"Lucida Sans Unicode", "Lucida Grande", sans-serif;
+    }
 .whBg{
     background:white;
 }
@@ -15,6 +23,10 @@ body {
     overflow:scroll;
     overflow-x: hidden;
 }
+#userList{
+min-height:400px;
+}
+
 #whiteboardDiv{
 min-height:400px;
 }
@@ -71,4 +83,20 @@ background:#B6BDD3;
 }
 .chatDiv{
 background:#DBDCFF;
+min-height:400px;
+}
+.no-click{
+cursor:help;
+}
+.tbContainer{
+    padding:50px;
+    min-height:800px;
+    background:white;
+}
+.headerTitle{
+    font-family:'PermanentMarker';
+}
+.helpHeader{
+ font-weight:bold;
+ font-size:15pt;
 }

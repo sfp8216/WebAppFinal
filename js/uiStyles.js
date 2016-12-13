@@ -8,7 +8,6 @@ $(document).ready(function() {
         $("#loginForm").slideToggle();
    });
     $(".pickColor").on("click",function(event){
-        console.log($(this).text());
         whiteboard.changeColor($(this).text());
-    });
+    });                                            
 });

@@ -11,7 +11,6 @@
 </script>
 <!-- Site Imports -->
   <link rel="stylesheet" href="css/styles.css">
-
   <script type="text/javascript" src="js/SvgElement.js"></script>
   <script type="text/javascript" src="js/Whiteboard.js"></script>
   <script type="text/javascript" src="js/scripts.js"></script>
@@ -19,11 +18,10 @@
   <title>TeachBoard - Login!</title>
 </head>
 <body class="container">
-    <div class="whBg">
-  <div class="text-center ">
-    <h1>TeachBoard - The Syncable Whiteboard App!</h1><br>
+<div class="whBg tbContainer">
+  <div class="text-center">
+    <h1 class="headerTitle">TeachBoard - The Syncable Whiteboard App!</h1><br>
     <br>
-
     <h3>Please Login or Create an Account to Continue!</h3>
   </div><br>
   <br>
