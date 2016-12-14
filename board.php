@@ -97,7 +97,7 @@
               <span class="input-group-btn">
                 <button class="btn btn-primary" type="button"  name="submitChat" id="submitChat" >Send</button>
               </span>
-              <input type="text" class="form-control" id="chatMessage" placeholder="Send Chat...">
+              <input type="text" class="form-control" id="chatMessage" placeholder="Message..." maxlength="150">
             </div>
         </form>
         </div>
@@ -157,7 +157,7 @@
           <div class="form-group">
             <label for="whiteboardNameInput" id="newBoardName" class="col-sm-2 control-label">Board Name:</label>
             <div class="col-sm-10">
-              <input type="text" class="form-control" id="whiteboardNameInput" placeholder="Your Whiteboard">
+              <input type="text" class="form-control" id="whiteboardNameInput" placeholder="Your Whiteboard"  required="required" maxlength="20">
             </div>
           </div>
           <div class="form-group">

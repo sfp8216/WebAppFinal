@@ -4,7 +4,7 @@ function cleanInputFields($inputFields) {
 	$cleanInput = htmlentities($cleanInput);
 	return $cleanInput;
 }
-function filterBy($input, $type, $length=null) {
+function filterBy($input, $type, $length=0) {
 	switch($type) {
 		case "Text" :
 			if($length) {
@@ -18,7 +18,12 @@ function filterBy($input, $type, $length=null) {
 						return "error";
 					}
 					else{
-						return $cleanInput;
+					    //Just make sure input isnt nothing
+                        if($input == ""){
+                            return "error";
+                        }else{
+						    return $cleanInput;
+                            }
 					}
 				}
 			}

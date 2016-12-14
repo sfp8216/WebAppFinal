@@ -7,16 +7,23 @@ require_once ("exception.php");
 function createLoginData($uName, $pWord) {
 	global $pdo;
 	try {
-		$stmt = $pdo->prepare("INSERT INTO users (username, password) VALUES (:user, :pass)");
+		$stmt = $pdo->prepare("INSERT INTO users (username, password, status) VALUES (:user, :pass, 1)");
 		$stmt->bindParam(':user', $uName);
 		$stmt->bindParam(':pass', $pWord);
 		$stmt->execute();
-		$count = $stmt->rowCount();
+		$count = $stmt->rowCount();    
 		if($count == 1) {
+		    $sql = "SELECT userId, status FROM users WHERE username =?";
+            if($stmt=$pdo->prepare($sql)){
+                $stmt->bindParam(1,$uName);
+                $stmt->execute();
+                $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                $result = $result[0];
+                $_SESSION['Logged'] = '[{"Logged":"true","userId":"' . $result['userId'].'","Username":"'.$uName.'"}]';
+            }
 			return '[{"Create":"success"}]';
 		}
 		else{
-			var_dump($count);
 			return '[{"Create":"fail"}]';
 		}
 	}

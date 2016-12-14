@@ -70,7 +70,7 @@ function checkLoginSvs($data, $ip, $token) {
 	//If not logged in
 	if($userId != "" && $passWord != "") {
 		if(!isset($_SESSION["Logged"])) {
-			$userId = filterBy($userId, "Text", 5);
+			$userId = filterBy($userId, "Text", 20);
 			$passWord = filterBy($passWord, "Text", 50);
 			$checkToken = filterBy($checkToken, "Text", 150);
 			if($userId != "error" && $passWord != "error" && $checkToken != "error") {
@@ -103,7 +103,7 @@ function createLoginSvs($data) {
 }
 function getUserListSvs($data) {
 	$lobbyId = $data;
-	require_once ('BizDataLayer/checkLogin.php');   
+	require_once ('BizDataLayer/checkLogin.php');
 	echo (getUserListData($data));
 }
 function logoutSvs($data, $ip, $token) {

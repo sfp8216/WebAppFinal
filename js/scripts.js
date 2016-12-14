@@ -8,15 +8,21 @@ $(document).ready(function () {
         checkExpiredLogin();
         checkLogin();
         $("#submitBtn").on('click', function (event) {checkLogin();});
-        $("#newUserBtn").on('click', function (event) {createLogin();});
+        $("#newUserBtn").on('click', function (event) {
+            if($("#newUser").val() != "" && $("#newPass").val()!= ""){
+            createLogin();
+            }
+            });
         $("#submitChat").on('click', function (event) {sendChat();});
         $("#logoutBtn").on('click', function (event) {logout();});
 
         $("#submitNewBoard").on('click', function (event) {
                 var boardName = $("#whiteboardNameInput").val();
+                if(boardName != ""){
                 var publicBool = $('input[name=publicRadio]:checked', '#createWb').val();
                 createBoard(boardName, publicBool);
                 $("#newBoardModal").modal("hide");
+                }
             });
 
         $("#confirmInvite").on('click', function (event) {
@@ -119,7 +125,9 @@ function checkLogin() {
                     checkInvites();
                     getBoards();
                 } else {
-                    alert("Failed");
+                    var loginError = $("#loginError");
+                    loginError.html("Your username or password was incorrect, please try again");
+                    loginError.removeClass("hidden");
                 }
             }
         });
@@ -133,7 +141,17 @@ function createLogin() {
             data: info
         }).done(function (json) {
             if (json[0].Error) {
-                alert("There was an error with your inputs, please fix them");
+                var loginError = $("#loginError");
+                    loginError.html("Username and password cannot be blank - or already exists.");
+                    loginError.removeClass("hidden");
+              //  alert("There was an error with your inputs, please fix them");
+            }else{
+                if(json[0].Create != "fail"){
+                                window.location.href = "board.php";
+                }
+            var loginError = $("#loginError");
+                    loginError.html("Account name already taken - Or your inputs are invalid");
+                    loginError.removeClass("hidden");
             }
         });
 }

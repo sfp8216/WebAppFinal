@@ -34,17 +34,21 @@
     <div class="col-md-2 ">
       <button type="button" class="btn btn-primary" id="toggleCreate">Create Account</button>
     </div>
-  </div><br>
+  </div>
+  <br>
+    <div class="row">
+        <div id="loginError" class="col-md-4 col-md-offset-4 alert alert-danger text-center hidden"></div>
+    </div>
   <br>
 
   <div class="row ">
       <div class="col-md-4"></div>
     <div id="loginForm" class="col-md-4 formWBorder">
       <h2 class="text-center">Login:</h2>
-      <form method="post" id="login" name="login" class="form-inline">
-        <span  class="col-md-4">Username:</span><input type="text" name="username" id="username" class="form-control col-md-8"><br>
-        <span class="col-md-4">Password:</span><input type="password" name="password" id="password" class="form-control col-md-8"><br><br><br>
-        <button type="button" class="btn btn-primary col-md-4" name="submitBtn" id="submitBtn">Login</button>
+      <form method="post" id="login" name="login" class="form-inline" onsubmit="return false;">
+        <span  class="col-md-4">Username:</span><input type="text" name="username" id="username" class="form-control col-md-8 formRequired" required="required" maxlength="20"><br>
+        <span class="col-md-4">Password:</span><input type="password" name="password" id="password" class="form-control col-md-8 formRequired" required="required" maxlength="50"><br><br><br>
+        <button type="submit" class="btn btn-primary col-md-4" name="submitBtn" id="submitBtn">Login</button>
         <button type="reset" class="btn btn-warning col-md-4 col-md-offset-4">Reset</button>
       </form>
     </div>
@@ -53,10 +57,10 @@
        <div class="col-md-4"></div>
     <div id="createForm" class="col-md-4 formWBorder ">
     <h2 class="text-center">Account Creation:</h2>
-      <form method="post" id="createLogin" name="createLogin" class="form-inline ">
-        <span  class="col-md-4">Username:</span><input type="text" name="newUser" id="newUser" class="form-control col-md-8" autocorrect="off"><br>
-        <span  class="col-md-4">Password:</span><input type="password" name="newPass" id="newPass" class="form-control col-md-8" autocorrect="off"><br><br>
-        <button type="button" name="submitBtn" id="newUserBtn" class="btn btn-success col-md-4">Create</button><button type="reset" class="btn btn-warning col-md-4 col-md-offset-4">Reset</button>
+      <form method="post" id="createLogin" name="createLogin" class="form-inline" onsubmit="return false;">
+        <span  class="col-md-4">Username:</span><input type="text" name="newUser" id="newUser" class="form-control col-md-8" required="required" maxlength="20"><br>
+        <span  class="col-md-4">Password:</span><input type="password" name="newPass" id="newPass" class="form-control col-md-8" required="required" maxlength="50"><br><br>
+        <button type="submit" name="submitBtn" id="newUserBtn" class="btn btn-success col-md-4">Create</button><button type="reset" class="btn btn-warning col-md-4 col-md-offset-4">Reset</button>
       </form>
     </div>
   </div>
