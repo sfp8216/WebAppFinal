@@ -1,7 +1,7 @@
 <?php
 /*Clean Bill*/
 //include dbInfo
-require_once ("../dbinfo.inc");
+require_once ("../../dbinfo.inc");
 //include exceptions
 require_once ('exception.php');
 function getBoardsData($userId) {
@@ -47,7 +47,7 @@ function getBoardsData($userId) {
 }
 function checkLockData($boardId, $overwrite, $userId) {
 	global $pdo;
-	$sql = "SELECT locked, timelock, userId FROM whiteboard WHERE boardId = ?";
+	$sql = "SELECT wb.locked, wb.timelock, wb.userId, usr.username FROM whiteboard wb INNER JOIN users usr on (wb.userId = usr.userId) WHERE wb.boardId = ?";
 	try {
 		if($stmt = $pdo->prepare($sql)) {
 			$stmt->bindParam(1, $boardId);
@@ -79,7 +79,7 @@ function checkLockData($boardId, $overwrite, $userId) {
 							return '[{"Locked":"timed"}]';
 						}
 						else{
-							return '[{"Locked":"true"}]';
+							return '[{"Locked":"true","Username":"'.$results["username"].'"}]';
 						}
 					}
 				}

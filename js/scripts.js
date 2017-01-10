@@ -85,7 +85,7 @@ function checkLogin() {
     var userName = $("#username").val();
     var info = $("#username").val() + "|" + $("#password").val() + "|" + userAgent;
 
-    myXhr('get', {
+    myXhr('post', {
             method: 'checkLoginSvs',
             a: 'login',
             data: info
@@ -135,7 +135,7 @@ function checkLogin() {
 
 function createLogin() {
     var info = $("#newUser").val() + "|" + $("#newPass").val();
-    myXhr('get', {
+    myXhr('post', {
             method: 'createLoginSvs',
             a: 'login',
             data: info
@@ -201,7 +201,7 @@ function getUserList(lobbyId) {
 }
 
 function logout() {
-    myXhr('get', {
+    myXhr('post', {
             method: 'logoutSvs',
             a: 'login',
             data: "null"
@@ -288,7 +288,7 @@ function getChatLobbies() {
 function sendChat() {
     var lobbyId = $("#submitChat").attr("name");
     var chatMessage = $("#chatMessage").val();
-    myXhr('get', {
+    myXhr('post', {
             method: 'sendChatSvs',
             a: 'chat',
             data: lobbyId + "|" + chatMessage
@@ -342,7 +342,7 @@ function checkInvites() {
 function inviteToBoard(boardId, userId) {
     //Data is
     // boardid|Inviter|Invited
-    myXhr('get', {
+    myXhr('post', {
             method: 'inviteToBoardSvs',
             a: 'board',
             data: boardId + "|" + userId
@@ -433,7 +433,7 @@ function getBoards() {
 }
 
 function createBoard(boardName, publicBool) {
-    myXhr('get', {
+    myXhr('post', {
             method: 'createBoardSvs',
             a: 'board',
             data: boardName + "|" + publicBool
@@ -442,7 +442,7 @@ function createBoard(boardName, publicBool) {
         });
 }
 function deleteBoard(boardName) {
-    myXhr('get', {
+    myXhr('post', {
             method: 'deleteBoardSvs',
             a: 'board',
             data: boardName
@@ -489,7 +489,7 @@ function loadBoard(boardId) {
                     var locked = json[0].Locked;
                     //if it is locked
                     if (locked == "true") {
-                        $("#locked").text("Board in use please wait!").attr("class", "");
+                        $("#locked").text(json[0].Username+" is drawing please wait!").attr("class", "");
                         $("#toolBar button").prop("disabled",true);
                         var inUse = document.createElement("span");
                         inUse.setAttribute("class", "glyphicon glyphicon-pencil");
@@ -530,7 +530,7 @@ function loadBoard(boardId) {
 }
 
 function acceptBoardInvite(input) {
-    myXhr("get", {
+    myXhr("post", {
             method: "updateInviteSvs",
             a: 'board',
             data: input + "|1"
@@ -593,7 +593,7 @@ function createToolbar(boardId,owner){
     clearBtn.setAttribute("class","btn btn-warning col-md-3");
     clearBtn.setAttribute("id","clearBoardBtn");
     clearBtn.addEventListener('click',function(){
-        myXhr('get',{method:'clearBoardSvs',a:'board',data:boardId}).done(function(){
+        myXhr('post',{method:'clearBoardSvs',a:'board',data:boardId}).done(function(){
             alert("Cleared");
             loadBoard(boardId);
         });

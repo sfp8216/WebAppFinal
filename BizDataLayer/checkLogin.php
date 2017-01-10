@@ -1,6 +1,6 @@
 <?php
 //include dbInfo
-require_once ("../dbinfo.inc");
+require_once ("../../dbinfo.inc");
 //include exceptions
 function checkLoginData($uName, $pWord, $token) {
 	global $pdo;

@@ -1,7 +1,7 @@
 <?php
 /*Clean Bill*/
 //include dbInfo
-require_once ("../dbinfo.inc");
+require_once ("../../dbinfo.inc");
 //include exceptions
 require_once ("exception.php");
 function createLoginData($uName, $pWord) {
@@ -11,7 +11,7 @@ function createLoginData($uName, $pWord) {
 		$stmt->bindParam(':user', $uName);
 		$stmt->bindParam(':pass', $pWord);
 		$stmt->execute();
-		$count = $stmt->rowCount();    
+		$count = $stmt->rowCount();
 		if($count == 1) {
 		    $sql = "SELECT userId, status FROM users WHERE username =?";
             if($stmt=$pdo->prepare($sql)){
