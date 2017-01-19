@@ -47,4 +47,13 @@ function checkChatInviteSvs($data) {
 		echo (checkChatInviteData($userId));
 	}
 }
+
+function checkInviteHistorySvs($data){
+    if(isset($_SESSION["Logged"])){
+        $sessionData = json_decode($_SESSION["Logged"]);
+        $userId = $sessionData[0]->{'userId'};
+        echo(checkInviteHistoryData($userId));
+    }
+}
+
 ?>

@@ -86,9 +86,21 @@ function inviteToBoardSvs($data) {
 	// BoardName|OwnerId| ChatLobbyId| Public or private
 	$boardId = $h[0];
 	$userId = $h[1];
-	$inviteer = getSessionUserId();   
+	$inviteer = getSessionUserId();
 	if(filterBy($boardId, "Number") != "error" && filterBy($userId, "Text") != "error" && filterBy($inviteer, "Number") != "error") {
 	 	echo (inviteToBoardData($boardId, $userId, $inviteer));
+	}
+}
+function removeFromBoardSvs($data) {
+	$h = explode('|', $data);
+	//Data =
+	// BoardName|OwnerId| ChatLobbyId| Public or private
+	$boardName = $h[0];
+	$userId = $h[1];
+	$inviteer = getSessionUserId();
+    var_dump($data);
+	if(filterBy($boardName, "Text") != "error" && filterBy($userId, "Text") != "error" && filterBy($inviteer, "Number") != "error") {
+	 	echo (removeFromBoardData($boardName, $userId, $inviteer));
 	}
 }
 function updateInviteSvs($data) {

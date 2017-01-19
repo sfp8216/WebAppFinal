@@ -44,16 +44,24 @@
     <div class="col-md-6 whBg">
     <h2>Whiteboards:</h2>
         <!--Whiteboard list -->
-        <div class="col-md-8" id="listOfBoards">
+        <div class="col-md-12" id="listOfBoards">
         </div>
 
     </div>
     <!--Invites  -->
     <div class="col-md-6 text-center">
+        <div class="col-md-6">
+            <h2>Invite History</h2>
+            <div id="inviteHistory">
+                No invitation history.
+            </div>
+        </div>
+        <div class="col-md-6">
         <h2>Pending Invites</h2>
             <!--Invites go here  -->
         <div id="InviteStatus">
         You have no pending invites.
+        </div>
         </div>
     </div>
     </div>
@@ -61,11 +69,14 @@
     <div class="row whBg" id="whiteboardDiv">
     <hr/>
         <div class="row">
-            <div class="col-md-5 col-md-offset-1">
+            <div class="col-md-1">
+                <h2 id="backbtn" class='btn btn-primary go-back'>Back</h2>
+            </div>
+            <div class="col-md-5">
                 <h2 id="whiteBoardName">Select a Whiteboard!</h2>
             </div>
             <div class="col-md-6">
-               <h2 id="locked"></h2>
+               <h2 id="locked">Main Lobby</h2>
                <span id="timer"></span>
             </div>
         </div>
@@ -219,6 +230,24 @@
           <div class=" col-md-6"><button type="button" class='btn btn-primary' id="confirmDeleteBoard">Confirm</button></div>
           <div class=" col-md-6"><button class="btn btn-primary" data-dismiss="modal">Cancel</button></div>
           </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- UNINVITE MODAL -->
+<div id="uninviteModal" class="modal fade" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+         <h4 class="modal-title" id="exampleModalLabel">Confirm Uninvite?</h4>
+      </div>
+      <div class="modal-body">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="confirmUninvite">Confirm</button>
       </div>
     </div>
   </div>

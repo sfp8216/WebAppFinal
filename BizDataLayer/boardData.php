@@ -247,6 +247,40 @@ function inviteToBoardData($boardId, $userId, $inviter) {
 		return "Error";
 	}
 }
+
+function removeFromBoardData($boardName, $userId, $inviter) {
+	global $pdo;
+	try {
+		$sql = "SELECT inv.inviter as Inviter, usr.username, brd.name FROM invites inv INNER JOIN users usr on (inv.invitee = usr.userId) INNER JOIN whiteboard brd on (inv.boardId = brd.boardId) WHERE Inviter = ? AND usr.username = ? AND brd.name =?";
+		if($stmt = $pdo->prepare($sql)) {
+			$stmt->bindParam(1, $inviter);
+			$stmt->bindParam(2, $userId);
+			$stmt->bindParam(3, $boardName);
+			$stmt->execute();
+			$rowCount = $stmt->rowCount();
+            if($rowCount == 1){
+                $sql = "DELETE inv FROM invites inv INNER JOIN users usr on (inv.invitee = usr.userId) INNER JOIN whiteboard brd on (inv.boardId = brd.boardId) WHERE inv.inviter = ? AND usr.username = ? AND brd.name =?;";
+                $sql .= "DELETE chatusr FROM chatusers chatusr INNER JOIN users usr on (chatusr.userId = usr.userId) INNER JOIN whiteboard brd on (chatusr.lobbyId = brd.lobbyId) WHERE usr.username = ? AND brd.name =?";
+                if($stmt = $pdo -> prepare($sql)){
+                    $stmt->bindParam(1, $inviter);
+        			$stmt->bindParam(2, $userId);
+        			$stmt->bindParam(3, $boardName);
+        			$stmt->bindParam(4, $userId);
+        			$stmt->bindParam(5, $boardName);
+        			$stmt->execute();
+        			$rowCount = $stmt->rowCount();
+                }
+            }else{
+                return json_encode("Error:Your Not Admin");
+            }
+            return "[{'Delete','Success'}]";
+		}
+	}
+	catch (Exception $e) {
+		return "Error";
+	}
+}
+
 function acceptBoardInviteData($boardName, $inviter, $invitee) {
 	global $pdo;
 	$sql = "UPDATE invites inv INNER JOIN whiteboard wb ON wb.boardId = inv.boardId SET accepted = 1 Where wb.name = ? AND inv.invitee = ?;";

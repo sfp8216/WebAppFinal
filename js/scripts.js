@@ -29,11 +29,20 @@ $(document).ready(function () {
                 var boardId = $("svg").attr("data-id");
                 inviteToBoard(boardId, this.getAttribute("data-username"));
                 $("#inviteModal").modal("hide");
+                checkInviteHistory();
+            });
+
+        $("#confirmUninvite").on('click', function (event) {
+                 removeFromBoard(this.getAttribute("data-name"), this.getAttribute("data-username"));
+                $("#uninviteModal").modal("hide");
+                getBoards();
+                checkInviteHistory();
             });
 
         $("#acceptBoardInviteBtn").on('click', function (event) {
                 acceptBoardInvite($(this).attr("data-id"));
                 $("#acceptModal").modal("hide");
+                checkInviteHistory();
             });
 
         $("#denyBoardInviteBtn").on('click', function (event) {
@@ -48,6 +57,18 @@ $(document).ready(function () {
                 modal.find('.modal-body').text("Are you sure you want to invite " +
                         recipient + "?");
                 modal.find('#confirmInvite').attr("data-username", recipient);
+            });
+            //Uninvite modal
+                $('#uninviteModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var recipient = button.data('username');
+                var boardName = button.data('board');
+                var modal = $(this);
+                modal.find('.modal-title').text('Uninvite ' + recipient);
+                modal.find('.modal-body').text("Are you sure you want to uninvite " +
+                        recipient + " from " + boardName + " ?");
+                modal.find('#confirmUninvite').attr("data-username", recipient);
+                modal.find('#confirmUninvite').attr("data-name", boardName);
             });
 
         $('#acceptModal').on('show.bs.modal', function (event) {
@@ -67,6 +88,18 @@ $(document).ready(function () {
            var id = $("#whiteBoardName").text();
            deleteBoard(id);
         });
+        //Button to go back to main lobby
+        $("#backbtn").on('click',function(event){
+            $("#whiteBoardName").html("Select a Whiteboard!");
+            $("#locked").text("Main Lobby");
+            $("#chatRoomUsers").text("");
+            $("#boardSpace").html("");
+            clearTimeout(checkBoard);
+            clearTimeout(checkChat);
+            getChat(-1);
+        });
+
+
     });
 /*****************************
  *
@@ -90,9 +123,8 @@ function checkLogin() {
             a: 'login',
             data: info
         }).done(function (json) {
-            if (json[0].Error) {
+            if (json[0].Error || json[0].Logged == "fail") {
                     window.location.href = "login.php";
-
             } else { // No error with sanitzation
                 $('#logged').html('Logged in: ' + json[0].Logged);
                 var status = json[0].Logged;
@@ -100,6 +132,9 @@ function checkLogin() {
                 if ($("#greetBanner")) {
                     $("#greetBanner").text("Welcome " + json[0].Username);
                     $("#loggedInAs").html(json[0].Username);
+                    //Public chat
+                    clearTimeout(checkChat);
+                    getChat(-1);
                 }
                 if (token != null) {
                     if (token == "Browser") {
@@ -122,6 +157,7 @@ function checkLogin() {
                     }
                     //Remove chat lobbies
                     getUserList();
+                    checkInviteHistory();
                     checkInvites();
                     getBoards();
                 } else {
@@ -194,7 +230,7 @@ function getUserList(lobbyId) {
             if(currentUsers.length == 0){
                 $(".userListItem").removeAttr("data-toggle").addClass("no-click");
             }else{
-                  $(".userListItem").removeClass("no-click");
+                $(".userListItem").removeClass("no-click");
             }
 
         });
@@ -286,6 +322,7 @@ function getChatLobbies() {
 }
 
 function sendChat() {
+    clearTimeout(checkChat);
     var lobbyId = $("#submitChat").attr("name");
     var chatMessage = $("#chatMessage").val();
     myXhr('post', {
@@ -296,6 +333,31 @@ function sendChat() {
             $("#chatMessage").val('');
             getChat(lobbyId);
         });
+}
+
+function checkInviteHistory(){
+    myXhr('get',{
+        method:"checkInviteHistorySvs",
+        a:"chat",
+        data:"null"
+    }).done(function(json){
+        if(json.length > 0){
+            $("#inviteHistory").html('');
+            var inviteText = "<table class='table tableoverflow'><tr><th>Name</th><th>Board</th><th>Status</th></tr>";
+            for(i = 0; i < json.length;i++){
+                inviteText += "<tr><td>"+ json[i].username + "</td><td>" + json[i].name + "</td>";
+                if(json[i].accepted == 1){
+                    inviteText += "<td style='color:green;font-weight:bold;cursor:pointer;' data-toggle='modal' data-target='#uninviteModal' data-username=" +
+                            json[i].username +" data-board=" +
+                            json[i].name +">Accepted</td></tr>";
+                }else{
+                      inviteText += "<td style='color:red;'>Pending</td></tr>";
+                }
+            }
+                inviteText += "</table>";
+                $("#inviteHistory").append(inviteText);
+        }
+    });
 }
 
 function checkInvites() {
@@ -335,6 +397,10 @@ function checkInvites() {
         });
     inviteTimeout = setTimeout(function () {
         checkInvites();
+        //Retrieves invite history
+        checkInviteHistory();
+        //Checks for new boards
+        getBoards();
         //15 SECONDS
     }, 15000);
 }
@@ -346,6 +412,17 @@ function inviteToBoard(boardId, userId) {
             method: 'inviteToBoardSvs',
             a: 'board',
             data: boardId + "|" + userId
+        }).done(function (json) {
+        });
+}
+
+function removeFromBoard(boardName, userId) {
+    //Data is
+    // boardid|Inviter|Invited
+    myXhr('get', {
+            method: 'removeFromBoardSvs',
+            a: 'board',
+            data: boardName + "|" + userId
         }).done(function (json) {
         });
 }
@@ -619,6 +696,17 @@ function createToolbar(boardId,owner){
 
     return rowDiv;
 }
+
+ /*****************************
+ *
+ *
+ *------- MISC  ---------------
+ *
+ *
+ *****************************/
+
+ function uninvite(name,board){
+ }
 
 /*****************************
  *

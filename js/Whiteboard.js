@@ -29,6 +29,8 @@ Whiteboard.prototype={
     $("#whiteBoardName").html(title);
     document.getElementById(this.parent).appendChild(whiteboard);
     init(this.name);
+    //Show back button
+    $('#backbtn').show();
  },
  changeColor:function(newColor){
     color = newColor;
@@ -129,7 +131,6 @@ var drawingTurn = 0;
     return event;
 }
     function checkLockStatus(boardId,override){
-
         //Also refresh the userlist
         $("#userList").html("");
         getUserList();

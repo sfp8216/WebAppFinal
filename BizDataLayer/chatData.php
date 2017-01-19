@@ -91,6 +91,23 @@ function checkChatInviteData($data) {
 	    return '[{"Error":"CheckInvite"}]"';
 	}
 }
+function checkInviteHistoryData($data){
+    global $pdo;
+    	$sql = "SELECT cu.inviter, usr.username, wb.name, cu.datetime, cu.accepted FROM invites cu INNER JOIN users usr on cu.invitee = usr.userId LEFT JOIN whiteboard wb on cu.boardId = wb.boardId WHERE cu.inviter = ?";
+    try {
+		if($stmt = $pdo->prepare($sql)) {
+			$stmt->bindParam(1, $data);
+			$stmt->execute();
+			$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+			$answer = "";
+			$rowCount = $stmt->rowCount();
+			echo json_encode($results);
+		}
+	}
+	catch (Exception $e) {
+	    return '[{"Error":"CheckInvite"}]"';
+	}
+}
 /*********************************Utilities*********************************/
 /*************************
 returnJson
