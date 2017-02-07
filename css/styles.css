@@ -1,0 +1,116 @@
+/*FONTS*/
+@font-face {
+  font-family: 'PermanentMarker';
+  src:  url('PermanentMarker.ttf'); /* IE9 Compat Modes */
+  src: local('PermanentMarker'),local('PermanentMarker'),url('fonts/PermanentMarker.ttf') format('truetype')
+}
+
+body {
+    padding-top: 5rem;
+    background-image: url("img/green_cup.png");
+    font-family:"Lucida Sans Unicode", "Lucida Grande", sans-serif;
+    }
+.whBg{
+    background:white;
+}
+
+.starter-template {
+    padding: 3rem 1.5rem;
+    text-align: center;
+}
+.chatOverFlow{
+    max-height:400px;
+    overflow:scroll;
+    overflow-x: hidden;
+}
+#userList{
+min-height:400px;
+}
+
+#whiteboardDiv{
+min-height:400px;
+}
+
+.userListItem{
+cursor:pointer;
+}
+#createForm{
+display:none;
+}
+
+#listOfBoards{
+max-height:160px;
+overflow:scroll;
+overflow-x:hidden;
+}
+.statusOnline{
+    border-radius: 50%;
+    width: 10px;
+    height: 10px;
+    display:inline-block;
+    background:green;
+}
+.statusOffline{
+    border-radius: 50%;
+    width: 10px;
+    height: 10px;
+    background:red;
+    display:inline-block;
+}
+.colorModal {
+    position: absolute;
+    top: 500px;
+    right: 100px;
+    bottom: 0;
+    left: 0;
+    z-index: 10040;
+    overflow: auto;
+    overflow-y: auto;
+}
+.pickColor{
+    padding:5px;
+    margin:5px;
+    border:2px solid black;
+    text-align:center;
+    border-radius:200%;
+    height:40px;
+}
+.formWBorder{
+    border:2px solid blue;
+    border-radius:5%;
+    padding-top:25px;
+    padding-left:25px;
+    padding-bottom:25px;
+    background:#B6BDD3;
+}
+#username, #password, #newUser, #newPass{
+    width:100%;
+}
+
+.chatDiv{
+background:#DBDCFF;
+min-height:400px;
+}
+.no-click{
+cursor:help;
+}
+.tbContainer{
+    padding:50px;
+    min-height:800px;
+    background:white;
+}
+.headerTitle{
+    font-family:'PermanentMarker';
+}
+.helpHeader{
+ font-weight:bold;
+ font-size:15pt;
+}
+#inviteHistory{
+max-height:160px;
+overflow-y:scroll;
+}
+.go-back{
+    font-size:13pt;
+    display:none;
+}
